@@ -43,6 +43,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.nhindirect.common.cert.Thumbprint;
 import org.nhindirect.config.model.utils.CertUtils;
 
 @Entity

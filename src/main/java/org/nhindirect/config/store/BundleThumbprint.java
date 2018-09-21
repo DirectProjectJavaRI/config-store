@@ -25,6 +25,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
+import org.nhindirect.common.cert.Thumbprint;
+
 /**
  * An bundle thumb print. Thumb print is essentially a SHA-1 digest of
  * the raw binary bundle file.

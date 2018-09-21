@@ -18,6 +18,7 @@ import java.util.Locale;
 import javax.persistence.EntityManager;
 
 import org.junit.Test;
+import org.nhindirect.common.cert.Thumbprint;
 import org.nhindirect.config.store.dao.impl.TrustBundleDaoImpl;
 
 

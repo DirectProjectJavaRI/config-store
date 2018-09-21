@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import org.junit.Test;
+import org.nhindirect.common.cert.Thumbprint;
 import org.nhindirect.config.store.dao.impl.TrustBundleDaoImpl;
 
 public class TrustBundleDaoImpl_addTrustBundleTest extends TrustBundleDaoBaseTest
