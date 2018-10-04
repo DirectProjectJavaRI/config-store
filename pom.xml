@@ -18,8 +18,8 @@
 	<parent>
 	   <groupId>org.springframework.boot</groupId>
 	   <artifactId>spring-boot-dependencies</artifactId>
-	   <version>2.0.5.RELEASE</version>
-	</parent>
+	   <version>2.1.0.M4</version>
+	</parent>	
     <developers>
         <developer>
             <name>Pat Pyette</name>
@@ -48,6 +48,14 @@
           <url>http://nhindirect.org/BSDLicense</url>
        </license>
     </licenses>
+  	<repositories>
+	    <!-- Temp repository for Spring Boot Milestone -->
+        <repository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone Releases</name>
+            <url>https://repo.spring.io/milestone/</url>
+        </repository>
+     </repositories>     
 	<dependencies>
 	    <dependency>
 		    <groupId>org.springframework.boot</groupId>
@@ -56,15 +64,10 @@
 	    <dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-data-jpa</artifactId>
-	    </dependency>		    
+	    </dependency>    		    
 		<dependency>
 			<groupId>org.nhind</groupId>
 			<artifactId>direct-policy</artifactId>
-			<version>6.0-SNAPSHOT</version>
-		</dependency>	
-		<dependency>
-			<groupId>org.nhind</groupId>
-			<artifactId>direct-common</artifactId>
 			<version>6.0-SNAPSHOT</version>
 		</dependency>	
 		<dependency>

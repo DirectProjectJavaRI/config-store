@@ -5,13 +5,15 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.nhindirect.config.model.utils.CertUtils;
+import org.nhindirect.config.repository.CertificateRepositoryTest;
+import org.nhindirect.config.store.Certificate;
 
 public class Certfificate_setDataTest 
 {
 	@Test
 	public void testSetData_setWithProtectedData() throws Exception 
 	{
-		final byte[] certData = CertificateDaoTest.loadPkcs12FromCertAndKey("gm2552.der", "gm2552Key.der");
+		final byte[] certData = CertificateRepositoryTest.loadPkcs12FromCertAndKey("gm2552.der", "gm2552Key.der");
 		
 		final byte[] protectedCertData =  CertUtils.changePkcs12Protection(certData, "".toCharArray(), "".toCharArray(), 
 				"12345".toCharArray(), "67890".toCharArray());

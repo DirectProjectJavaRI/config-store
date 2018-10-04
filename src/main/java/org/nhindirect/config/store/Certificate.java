@@ -26,7 +26,6 @@ import java.net.URL;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
@@ -44,6 +43,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.nhindirect.common.cert.Thumbprint;
+import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.model.utils.CertUtils;
 
 @Entity
@@ -54,42 +54,11 @@ import org.nhindirect.config.model.utils.CertUtils;
 public class Certificate 
 {
 
-	private static final String DEFAULT_JCE_PROVIDER_STRING = "BC";
-	private static final String JCE_PROVIDER_STRING_SYS_PARAM = "org.nhindirect.config.JCEProviderName";	
-	
 	static
 	{
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		CryptoExtensions.registerJCEProviders();
 	}	
 	
-	/**
-	 * Gets the configured JCE crypto provider string for crypto operations.  This is configured using the
-	 * -Dorg.nhindirect.config.JCEProviderName JVM parameters.  If the parameter is not set or is empty,
-	 * then the default string "BC" (BouncyCastle provider) is returned.  By default the agent installs the BouncyCastle provider.
-	 * @return The name of the JCE provider string.
-	 */
-	public static String getJCEProviderName()
-	{
-		String retVal = System.getProperty(JCE_PROVIDER_STRING_SYS_PARAM);
-		
-		if (retVal == null || retVal.isEmpty())
-			retVal = DEFAULT_JCE_PROVIDER_STRING;
-		
-		return retVal;
-	}
-	
-	/**
-	 * Overrides the configured JCE crypto provider string.  If the name is empty or null, the default string "BC" (BouncyCastle provider)
-	 * is used.
-	 * @param name The name of the JCE provider.
-	 */
-	public static void setJCEProviderName(String name)
-	{
-		if (name == null || name.isEmpty())
-			System.setProperty(JCE_PROVIDER_STRING_SYS_PARAM, DEFAULT_JCE_PROVIDER_STRING);
-		else
-			System.setProperty(JCE_PROVIDER_STRING_SYS_PARAM, name);
-	}	
 
     public static final byte[] NULL_CERT = new byte[] {};
 
@@ -103,6 +72,11 @@ public class Certificate
     private EntityStatus status;
     private boolean privateKey;
 
+    public Certificate()
+    {
+    	createTime = Calendar.getInstance();
+    }
+    
     /**
      * Get the value of owner.
      * 
@@ -399,7 +373,7 @@ public class Certificate
             // lets try this a as a PKCS12 data stream first
             try
             {
-            	KeyStore localKeyStore = KeyStore.getInstance("PKCS12", getJCEProviderName());
+            	KeyStore localKeyStore = KeyStore.getInstance("PKCS12", CryptoExtensions.getJCEProviderName());
             	
             	localKeyStore.load(bais, keyStorePass);
             	Enumeration<String> aliases = localKeyStore.aliases();

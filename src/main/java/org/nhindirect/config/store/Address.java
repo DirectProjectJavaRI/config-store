@@ -67,7 +67,9 @@ public class Address {
     /**
      * Construct an Address.
      */
-    public Address() {
+    public Address() 
+    {
+    	createTime = Calendar.getInstance();
     }
 
     /**

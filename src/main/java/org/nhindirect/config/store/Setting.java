@@ -18,6 +18,7 @@ package org.nhindirect.config.store;
 
 import java.util.Calendar;
 
+import javax.persistence.Index;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -29,7 +30,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "setting")
+@Table(name = "setting", indexes=@Index(columnList="name", unique=true))
 /**
  * The JPA settings class.  This tables holds various configuration settings such as how the configuration service should behave or settings
  * for a gateway.  This structure is made up of simple name value pairs. 

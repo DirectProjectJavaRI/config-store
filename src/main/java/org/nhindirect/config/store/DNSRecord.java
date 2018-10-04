@@ -51,6 +51,11 @@ public class DNSRecord
 	private byte[] data;
     private Calendar createTime;
     
+    public DNSRecord()
+    {
+    	this.createTime = Calendar.getInstance();
+    }
+    
     /**
      * Gets the internal id of the record.  The record id is the primary key of the record JPA store.
      * @return The internal id of the record.
@@ -154,6 +159,7 @@ public class DNSRecord
      * @return Gets the date/time the record was created.
      */
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "createTime")
     public Calendar getCreateTime() 
     {
     	if (createTime == null)

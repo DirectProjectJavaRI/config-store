@@ -8,6 +8,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import org.nhindirect.policy.PolicyLexicon;
 
 @Entity
-@Table(name = "certpolicy")
+@Table(name = "certpolicy", indexes=@Index(columnList="policyName", unique=true))
 public class CertPolicy 
 {
 	private long id;
@@ -28,7 +29,7 @@ public class CertPolicy
 	
 	public CertPolicy()
 	{
-		
+		createTime = Calendar.getInstance();
 	}
 	
     /**

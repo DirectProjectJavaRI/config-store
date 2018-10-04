@@ -36,6 +36,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -48,7 +49,7 @@ import javax.persistence.TemporalType;
  * @since 1.2
  */
 @Entity
-@Table(name = "trustbundle")
+@Table(name = "trustbundle", indexes=@Index(columnList="bundleName", unique=true))
 public class TrustBundle 
 {
 	private long id;
@@ -60,11 +61,12 @@ public class TrustBundle
     private Calendar lastRefreshAttempt;
     private BundleRefreshError lastRefreshError;
     private Calendar lastSuccessfulRefresh;    
-    private Calendar createTime;  
+    private Calendar createTime;
     private String checkSum;
     
     public TrustBundle()
     {
+    	createTime = Calendar.getInstance(); 
     	refreshInterval = 0;
     	checkSum = "";
     }
