@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface AnchorRepository extends JpaRepository<Anchor, Long>
 {
+	@Transactional
 	public List<Anchor> findByOwnerIgnoreCase(String owner);
 	
+	@Transactional
 	@Query("select a from Anchor a where upper(a.owner) in :owners")
 	public List<Anchor> findByOwnerInIgnoreCase(@Param("owners") List<String> owners);
 	

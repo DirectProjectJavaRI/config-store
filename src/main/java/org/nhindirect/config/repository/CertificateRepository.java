@@ -8,10 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface CertificateRepository extends JpaRepository<Certificate, Long>
 {
+	@Transactional
 	public List<Certificate> findByOwnerIgnoreCase(String owner);
 	
+	@Transactional
 	public Certificate findByOwnerIgnoreCaseAndThumbprint(String owner, String tp);
 	
+	@Transactional
 	public List<Certificate> findByThumbprint(String tb);
 	
 	@Transactional
