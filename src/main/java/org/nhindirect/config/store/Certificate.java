@@ -37,6 +37,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -47,7 +48,7 @@ import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.model.utils.CertUtils;
 
 @Entity
-@Table(name = "certificate")
+@Table(name = "certificate",   indexes={@Index(columnList="thumbprint", name="IDX_RI_CERTIFICATE_THUMBPRINT", unique=false)})
 /**
  * The JPA Certificate class
  */
