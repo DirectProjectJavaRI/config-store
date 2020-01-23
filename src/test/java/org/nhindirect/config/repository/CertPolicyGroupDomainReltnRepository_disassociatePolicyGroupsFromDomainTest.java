@@ -10,6 +10,8 @@ import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
 import org.springframework.transaction.annotation.Transactional;
 
+import reactor.test.StepVerifier;
+
 @Transactional
 public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupsFromDomainTest extends CertPolicyDaoBaseTest
 {
@@ -18,24 +20,34 @@ public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupsFromDo
 	{
 		Domain domain = new Domain();
 		domain.setDomainName("Test Domain");
-		domain = dmRepo.save(domain);
+		dmRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		CertPolicyGroup group = new CertPolicyGroup();
 		group.setPolicyGroupName("Test Group");
-		group = groupRepo.save(group);
+		groupRepo.save(group)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		final CertPolicyGroupDomainReltn addReltn = new CertPolicyGroupDomainReltn();
-		addReltn.setCertPolicyGroup(group);
-		addReltn.setDomain(domain);
+		addReltn.setCertPolicyGroupId(group.getId());
+		addReltn.setDomainId(domain.getId());
 		
-		reltnRepo.save(addReltn);
 		
-		Collection<CertPolicyGroupDomainReltn> reltn = reltnRepo.findByDomain(domain);
+		reltnRepo.save(addReltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
+		Collection<CertPolicyGroupDomainReltn> reltn = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(1, reltn.size());
 		
-		reltnRepo.deleteByDomain(domain);
+		reltnRepo.deleteByDomainId(domain.getId()).block();
 		
-		reltn = reltnRepo.findByDomain(domain);
+		reltn = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(0, reltn.size());
 	}
 }

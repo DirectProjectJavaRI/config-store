@@ -24,12 +24,19 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.CertPolicy;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface CertPolicyRepository extends JpaRepository<CertPolicy, Long>
+import reactor.core.publisher.Mono;
+
+public interface CertPolicyRepository extends ReactiveCrudRepository<CertPolicy, Long>
 {
-	public CertPolicy findByPolicyNameIgnoreCase(String policyName);
+	@Query("select * from certpolicy cp where upper(cp.policyName) = upper(:policyName)")
+	public Mono<CertPolicy> findByPolicyNameIgnoreCase(String policyName);
 	
-	public void deleteByIdIn(List<Long> ids);
+	@Transactional
+	@Query("delete from certpolicy where id in (:ids)")
+	public Mono<Void> deleteByIdIn(List<Long> ids);
 	
 }

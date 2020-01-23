@@ -1,13 +1,12 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +17,10 @@ import org.nhindirect.config.store.Address;
 import org.nhindirect.config.store.Domain;
 import org.nhindirect.config.store.EntityStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
+
+import reactor.test.StepVerifier;
 
 @Transactional
 public class DomainRepositoryTest  extends SpringBaseTest
@@ -42,15 +44,27 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Before
 	public void cleanDataBase()
 	{
-		addRepo.deleteAll();
-		domRepo.deleteAll();
+		addRepo.deleteAll()
+		.as(StepVerifier::create) 
+		.verifyComplete();
+		
+		domRepo.deleteAll()
+		.as(StepVerifier::create) 
+		.verifyComplete();
 	}
 	
 	@Test
 	public void testCleanDatabase() 
 	{
-		assertEquals(0, addRepo.findAll().size());
-		assertEquals(0, domRepo.findAll().size());
+		addRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
+		
+		domRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 	
 	@Test
@@ -58,19 +72,24 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	{
 
 		Domain domain = new Domain("health.testdomain.com");
-		domain.setStatus(EntityStatus.ENABLED);
-		domRepo.save(domain);
-		assertEquals(domRepo.count(), 1);
+		domain.setStatus(EntityStatus.ENABLED.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 	}
 	
 	@Test
 	public void testGetByDomain() 
 	{
 		Domain domain = new Domain("health.testdomain.com");
-		domain.setStatus(EntityStatus.ENABLED);
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.ENABLED.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Domain testDomain = domRepo.findByDomainNameIgnoreCase("health.testdomain.com");
+		Domain testDomain = domRepo.findByDomainNameIgnoreCase("health.testdomain.com").block();
 		log.info("Newly added Domain ID is: " + testDomain.getId());
 		log.info("Newly added Domain Status is: " + testDomain.getStatus());
 		
@@ -80,28 +99,31 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Test
 	public void testUpdateDomain() 
 	{
-		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SS Z");
 		Domain domain = new Domain("health.testdomain.com");
-		domain.setStatus(EntityStatus.ENABLED);
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.ENABLED.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Domain testDomain = domRepo.findByDomainNameIgnoreCase("health.testdomain.cOM");
+		Domain testDomain = domRepo.findByDomainNameIgnoreCase("health.testdomain.cOM").block();
 		log.info("Newly added Domain ID is: " + testDomain.getId());
 		log.info("Newly added Domain Status is: " + testDomain.getStatus());
-		log.info("Newly added Domain Update Time is: " + 
-				 fmt.format(new Date(testDomain.getUpdateTime().getTimeInMillis())));
+
 		assertTrue(testDomain.getDomainName().equals("health.testdomain.com"));
 		
-		testDomain.setStatus(EntityStatus.DISABLED);
-		domRepo.save(testDomain);
+		testDomain.setStatus(EntityStatus.DISABLED.ordinal());
+		domRepo.save(testDomain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		domain = domRepo.findByDomainNameIgnoreCase("health.testdomain.com");
+		domain = domRepo.findByDomainNameIgnoreCase("health.testdomain.com").block();
 		log.info("Updated Domain ID is: " + domain.getId());
 		log.info("Updated Status is: " + domain.getStatus());
-		log.info("Updated Update Time is: " + 
-				 fmt.format(new Date(domain.getUpdateTime().getTimeInMillis())));
+
 		
-		assertTrue(domain.getStatus().equals(EntityStatus.DISABLED));
+		assertTrue(domain.getStatus() == EntityStatus.DISABLED.ordinal());
 	}
 	
 	
@@ -109,27 +131,48 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	public void testGetDomain() 
 	{
 		Domain domain = new Domain("health.testdomain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.NEW.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
 		domain = new Domain("health.newdomain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.NEW.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		
 		List<String> names = new ArrayList<String>();
 		names.add("health.testdomain.com".toUpperCase());
 		
-		assertEquals(domRepo.findByDomainNameInIgnoreCaseAndStatus(names, EntityStatus.NEW).size(), 1);
-		assertEquals(domRepo.findByStatus(EntityStatus.NEW).size(), 2);
-		assertEquals(domRepo.findByDomainNameInIgnoreCase(names).size(), 1);
-		assertEquals(domRepo.findByDomainNameInIgnoreCaseAndStatus(names, EntityStatus.ENABLED).size(), 0);
-		assertEquals(domRepo.findByDomainNameInIgnoreCaseAndStatus(names, EntityStatus.DISABLED).size(), 0);
-		assertEquals(domRepo.findAll().size(), 2);
+		List<Domain> findDoms = domRepo.findByDomainNameInIgnoreCaseAndStatus(names, EntityStatus.NEW.ordinal()).collectList().block();
+		assertEquals(findDoms.size(), 1);
+		
+		findDoms = domRepo.findByStatus(EntityStatus.NEW.ordinal()).collectList().block();
+		assertEquals(findDoms.size(), 2);
+		
+		findDoms = domRepo.findByDomainNameInIgnoreCase(names).collectList().block();
+		assertEquals(findDoms.size(), 1);
+		
+		findDoms = domRepo.findByDomainNameInIgnoreCaseAndStatus(names, EntityStatus.ENABLED.ordinal()).collectList().block();
+		assertEquals(findDoms.size(), 0);
+		
+		findDoms = domRepo.findByDomainNameInIgnoreCaseAndStatus(names, EntityStatus.DISABLED.ordinal()).collectList().block();
+		assertEquals(findDoms.size(), 0);
+		
+		findDoms = domRepo.findAll().collectList().block();
+		assertEquals(findDoms.size(), 2);
 		
 		names.clear();
 		names.add("health.baddomain.com");
 		
-		assertEquals(0, domRepo.findByDomainNameInIgnoreCase(names).size());
+		domRepo.findByDomainNameInIgnoreCase(names)
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 	
 
@@ -137,113 +180,167 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	public void testDeleteDomain() 
 	{
 		Domain domain = new Domain("health.newdomain.com");
-		domain.setPostMasterEmail("postmaster@health.newdomain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domRepo.save(domain);
-		assertEquals(1, domRepo.count());
-		domRepo.deleteByDomainNameIgnoreCase("health.testdomain.cOM");
-		assertEquals(1, domRepo.count());
-		domRepo.deleteByDomainNameIgnoreCase("health.newdomain.com");
-		assertEquals(0, domRepo.count());
+		domain.setStatus(EntityStatus.NEW.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
+		assertEquals(Long.valueOf(1), domRepo.count().block());
+		
+		domRepo.deleteByDomainNameIgnoreCase("health.testdomain.cOM")
+		.as(StepVerifier::create) 
+		.verifyComplete();
+		
+		assertEquals(Long.valueOf(1), domRepo.count().block());
+		
+		
+		domRepo.deleteByDomainNameIgnoreCase("health.newdomain.com")
+		.as(StepVerifier::create) 
+		.verifyComplete();
+		
+		assertEquals(Long.valueOf(0), domRepo.count().block());
 	}
 
 	@Test
 	public void testSearchDomain() 
 	{
-		log.debug("Enter");
 		Domain domain = new Domain("health.newdomain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.NEW.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
 		
 		domain = new Domain("healthy.domain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.NEW.ordinal());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
 		
 		String name = "heaL";
-		List<Domain> result = domRepo.findByDomainNameContainingIgnoreCase(name);
+		List<Domain> result = domRepo.findByDomainNameContainingIgnoreCase("%" + name.toUpperCase() + "%").collectList().block();
 		assertEquals(2, result.size());
 		
 		name = "coM";
-		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus(name, EntityStatus.NEW);
+		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus("%" + name.toUpperCase() + "%", EntityStatus.NEW.ordinal()).collectList().block();
 		assertEquals(2, result.size());
 		
 		name = "coM";
-		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus(name, EntityStatus.DISABLED);
+		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus("%" + name.toUpperCase() + "%", EntityStatus.DISABLED.ordinal()).collectList().block();
 		assertEquals(0, result.size());
 		
 		log.debug("Exit");
 	}
 
 	
-	 //As it turns out, you have to save the owning entity (Domain) before you 
-	 //start adding dependent entities to it.
+
 	@Test 
 	public void testAddDomainsWithAddresses() 
 	{
 		
 		Domain domain = new Domain("health.newdomain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domain.getAddresses().add(new Address(domain, "test1@health.newdomain.com", "Test1"));
-		domain.getAddresses().add(new Address(domain, "test2@health.newdomain.com", "Test2"));
-		domain.getAddresses().add(new Address(domain, "postmaster@health.newdomain.com", "Test3"));
+		domain.setStatus(EntityStatus.NEW.ordinal());
+
 		
-		domRepo.save(domain);
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Domain getDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com");
-		assertEquals(3, getDomain.getAddresses().size());
+		Address addr = new Address(domain.getId(), "test1@health.newdomain.com", "Test1");
+		addRepo.save(addr)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		getDomain.setPostMasterEmail("postmaster@health.newdomain.com");
-		domRepo.save(getDomain);
+		addr = new Address(domain.getId(), "test2@health.newdomain.com", "Test2");
+		addRepo.save(addr)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		getDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com");
-		assertEquals("postmaster@health.newdomain.com", getDomain.getPostMasterEmail());
-		assertEquals(3, getDomain.getAddresses().size());
+		addr = new Address(domain.getId(), "postmaster@health.newdomain.com", "Test3");
+		addRepo.save(addr)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		log.info(domain.toString());
-		log.info(getDomain.toString());
-		Iterator<Address> iter = getDomain.getAddresses().iterator();
+		List<Address> getAddrs = addRepo.findByDomainId(domain.getId()).collectList().block();
+		assertEquals(3, getAddrs.size());
 		
-		while (iter.hasNext()) {
-			Address testAddress = iter.next();
-			log.info(testAddress.toString());
-		}
+		Address postmasterAddr = addRepo.findByEmailAddressIgnoreCase("postmaster@health.newDOMAIN.com").block();
+		assertNotNull(postmasterAddr);
+		
+		Domain getDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com").block();
+		getDomain.setPostmasterAddressId(postmasterAddr.getId());
+		domRepo.save(getDomain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
+		getDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com").block();
+		assertEquals(postmasterAddr.getId(), getDomain.getPostmasterAddressId());
+		
 	}
 	
-	
-	 //Don't need to clean the db before execution.  @TransactionConfiguration defaults to 
-	 //rolling back all transactions at the end of the method.   That should fail ONLY if the
-	 //tests db doesn't support transactions (in which case needs to be fixed)
-	 //
 	@Test
 	public void testDeleteDomainsWithAddresses() 
 	{
 		
 		Domain domain = new Domain("health.newdomain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domain.getAddresses().add(new Address(domain, "test1@health.newdomain.com", "Test1"));
-		domain.getAddresses().add(new Address(domain, "test2@health.newdomain.com", "Test2"));
-		domRepo.save(domain);
+		domain.setStatus(EntityStatus.NEW.ordinal());
 		
-		Domain test = domRepo.findByDomainNameIgnoreCase("health.newdomain.com");
-		assertEquals(2, test.getAddresses().size());
+		domRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		domRepo.deleteByDomainNameIgnoreCase("health.newdomain.COM");
-		test = domRepo.findByDomainNameIgnoreCase("health.newdomain.com");
-		assertEquals(null, test);
+		Address addr = new Address(domain.getId(), "test1@health.newdomain.com", "Test1");
+		addRepo.save(addr)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		domain = new Domain("health.domain.com");
-		domain.setStatus(EntityStatus.NEW);
-		domain.getAddresses().add(new Address(domain, "test1@health.domain.com", "Test1"));
-		domain.getAddresses().add(new Address(domain, "test2@health.domain.com", "Test2"));
-		domRepo.save(domain);
+		addr = new Address(domain.getId(), "test2@health.newdomain.com", "Test2");
+		addRepo.save(addr)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		test = domRepo.findByDomainNameIgnoreCase("health.domain.com");
-		Long id = test.getId();
-	
-		domRepo.deleteById(id);
-
-		assertEquals(Optional.empty(), domRepo.findById(id));
-
+		List<Address> getAddrs = addRepo.findByDomainId(domain.getId()).collectList().block();
+		assertEquals(2, getAddrs.size());
+		
+		// deleting the domain should cause as error due to addresses being tied to the domain
+		Domain addedDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com").block();
+		boolean exceptionOccured = false;
+		try
+		{
+			domRepo.deleteByDomainNameIgnoreCase("health.newdomain.COM").block();
+		}
+		catch (DataIntegrityViolationException e)
+		{
+			exceptionOccured = true;
+		}
+		
+		assertTrue(exceptionOccured);
+		
+		// Make sure the domain really didn't get deleted
+		addedDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com").block();
+		assertNotNull(addedDomain);
+		
+		this.addRepo.deleteByDomainId(addedDomain.getId()).block();
+		
+		getAddrs = addRepo.findByDomainId(domain.getId()).collectList().block();
+		assertEquals(0, getAddrs.size());
+		
+		// now try to delete the domain again... should work this time
+		domRepo.deleteByDomainNameIgnoreCase("health.newdomain.COM").block();
+		addedDomain = domRepo.findByDomainNameIgnoreCase("health.newdomain.com").block();
+		
+		assertNull(addedDomain);
 	}
-	
 }

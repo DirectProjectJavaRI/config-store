@@ -3,8 +3,7 @@ package org.nhindirect.config.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -13,7 +12,8 @@ import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.store.EntityStatus;
 import org.nhindirect.config.store.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+
+import reactor.test.StepVerifier;
 
 public class SettingRepositoryTest extends SpringBaseTest
 {	
@@ -25,30 +25,33 @@ public class SettingRepositoryTest extends SpringBaseTest
 		final Setting retVal = new Setting();
 		retVal.setName(name);
 		retVal.setValue(value);
-		retVal.setStatus(EntityStatus.ENABLED);
-		retVal.setUpdateTime(Calendar.getInstance());
-		retVal.setUpdateTime(Calendar.getInstance());
+		retVal.setStatus(EntityStatus.ENABLED.ordinal());
+		retVal.setUpdateTime(LocalDateTime.now());
+		retVal.setUpdateTime(LocalDateTime.now());
 		
 		return retVal;
 	}
 	
 	private void addSetting(String name, String value) throws Exception
 	{
-		repo.save(newSetting(name, value));
+		repo.save(newSetting(name, value)).block();
 	}	
 	
 	@Before
 	public void cleanDataBase()
 	{
-		repo.deleteAll();
+		repo.deleteAll()
+		.as(StepVerifier::create) 
+		.verifyComplete();
 	}
 	
 	@Test
 	public void testCleanDatabase() throws Exception 
 	{
-		Collection<Setting> settings = repo.findAll();
-		
-		assertEquals(0, settings.size());
+		repo.findAll()
+		.as(StepVerifier::create) 
+		.expectNextCount(0) 
+		.verifyComplete();
 	}
 	
 	@Test 
@@ -58,7 +61,7 @@ public class SettingRepositoryTest extends SpringBaseTest
 		addSetting("TestName1", "TestValue1");
 		addSetting("TestName2", "TestValue2");
 		
-		Collection<Setting> settings = repo.findAll();
+		Collection<Setting> settings = repo.findAll().collectList().block();
 		
 		assertEquals(2, settings.size());
 	}
@@ -74,7 +77,7 @@ public class SettingRepositoryTest extends SpringBaseTest
 		{
 			addSetting("TestName1", "TestValue2");
 		}
-		catch (DataIntegrityViolationException e)
+		catch (Exception e)
 		{
 			exceptionOccured = true;
 		}
@@ -89,7 +92,7 @@ public class SettingRepositoryTest extends SpringBaseTest
 		addSetting("TestName1", "TestValue1");
 		addSetting("TestName2", "TestValue2");
 		
-		Collection<Setting> settings = repo.findAll();
+		Collection<Setting> settings = repo.findAll().collectList().block();
 		
 		assertEquals(2, settings.size());
 		
@@ -97,7 +100,7 @@ public class SettingRepositoryTest extends SpringBaseTest
 		addSetting("TestName4", "TestValue4");
 		addSetting("TestName5", "TestValue5");
 		
-		settings = repo.findAll();
+		settings = repo.findAll().collectList().block();
 		
 		assertEquals(5, settings.size());
 		
@@ -110,25 +113,15 @@ public class SettingRepositoryTest extends SpringBaseTest
 		addSetting("TestName1", "TestValue1");
 		addSetting("TestName2", "TestValue2");
 		
-		Collection<Setting> settings = repo.findByNameIgnoreCaseIn(Arrays.asList("TestName1".toUpperCase()));
+		Setting setting = repo.findByNameIgnoreCase("TestName1".toUpperCase()).block();
 		
-		assertEquals(1, settings.size());
-		Setting setting = settings.iterator().next();
-		assertEquals("TestName1",  setting.getName());
 		assertEquals("TestValue1",  setting.getValue());
 		
 		
-		settings = repo.findByNameIgnoreCaseIn(Arrays.asList("TestNAme2".toUpperCase()));
+		setting = repo.findByNameIgnoreCase("TestNAme2".toUpperCase()).block();
 		
-		assertEquals(1, settings.size());
-		setting = settings.iterator().next();
 		assertEquals("TestName2",  setting.getName());
 		assertEquals("TestValue2",  setting.getValue());
-		
-		
-		settings = repo.findByNameIgnoreCaseIn(Arrays.asList("TestName1".toUpperCase(), "TestName2".toUpperCase()));
-		
-		assertEquals(2, settings.size());
 
 	}	
 	

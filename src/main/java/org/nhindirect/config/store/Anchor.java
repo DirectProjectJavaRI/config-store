@@ -24,38 +24,50 @@ package org.nhindirect.config.store;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.time.LocalDateTime;
 
 import org.nhindirect.common.cert.Thumbprint;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "anchor")
 /**
  * The JPA Domain class
  */
+@Table
 public class Anchor {
 
     private String owner;
     private String thumbprint;
+    
+    @Column("certificateId")
     private long certificateId;
+    
+    @Column("certificateData")
     private byte[] certificateData;
-    private long id;
-    private Calendar createTime;
-    private Calendar validStartDate;
-    private Calendar validEndDate;
-    private EntityStatus status;
+    
+    @Id
+    private Long id;
+    
+    @Column("createTime")
+    private LocalDateTime createTime;
+    
+    @Column("validStartDate")
+    private LocalDateTime validStartDate;
+    
+    @Column("validEndDate")
+    private LocalDateTime validEndDate;
+    
+    /*
+     * Map to EntityStatus ordinal
+     * Needed for backward compatibility
+     */
+    private int status;
+    
+    @Column("forIncoming")
     private boolean incoming;
+    
+    @Column("forOutgoing")
     private boolean outgoing;
 
     /**
@@ -63,7 +75,6 @@ public class Anchor {
      * 
      * @return the value of owner.
      */
-    @Column(name = "owner")
     public String getOwner() {
         return owner;
     }
@@ -83,7 +94,6 @@ public class Anchor {
      * 
      * @return the value of thumbprint.
      */
-    @Column(name = "thumbprint")
     public String getThumbprint() {
         return thumbprint;
     }
@@ -103,8 +113,6 @@ public class Anchor {
      * 
      * @return the value of certificateData.
      */
-    @Column(name = "certificateData", length=4096)
-    @Lob
     public byte[] getData() {
         return certificateData;
     }
@@ -130,10 +138,7 @@ public class Anchor {
      * 
      * @return the value of id.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -143,7 +148,7 @@ public class Anchor {
      * @param id
      *            The value of id.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -152,8 +157,7 @@ public class Anchor {
      * 
      * @return the value of createTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
@@ -163,7 +167,7 @@ public class Anchor {
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) {
+    public void setCreateTime(LocalDateTime timestamp) {
         createTime = timestamp;
     }
 
@@ -172,8 +176,7 @@ public class Anchor {
      * 
      * @return the value of validStartDate.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getValidStartDate() {
+    public LocalDateTime getValidStartDate() {
         return validStartDate;
     }
 
@@ -183,7 +186,7 @@ public class Anchor {
      * @param validStartDate
      *            The value of validStartDate.
      */
-    public void setValidStartDate(Calendar validStartDate) {
+    public void setValidStartDate(LocalDateTime validStartDate) {
         this.validStartDate = validStartDate;
     }
 
@@ -192,8 +195,7 @@ public class Anchor {
      * 
      * @return the value of validEndDate.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getValidEndDate() {
+    public LocalDateTime getValidEndDate() {
         return validEndDate;
     }
 
@@ -203,7 +205,7 @@ public class Anchor {
      * @param validEndDate
      *            The value of validEndDate.
      */
-    public void setValidEndDate(Calendar validEndDate) {
+    public void setValidEndDate(LocalDateTime validEndDate) {
         this.validEndDate = validEndDate;
     }
 
@@ -212,8 +214,7 @@ public class Anchor {
      * 
      * @return the value of status.
      */
-    @Enumerated
-    public EntityStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -223,7 +224,7 @@ public class Anchor {
      * @param status
      *            The value of status.
      */
-    public void setStatus(EntityStatus status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -232,7 +233,6 @@ public class Anchor {
      * 
      * @return the value of incoming.
      */
-    @Column(name = "forIncoming")
     public boolean isIncoming() {
         return incoming;
     }
@@ -252,7 +252,6 @@ public class Anchor {
      * 
      * @return the value of outgoing.
      */
-    @Column(name = "forOutgoing")
     public boolean isOutgoing() {
         return outgoing;
     }

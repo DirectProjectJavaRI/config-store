@@ -24,50 +24,46 @@ package org.nhindirect.config.store;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.Locale;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.nhindirect.common.cert.Thumbprint;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * JPA entity object for a trust bundle anchor
  * @author Greg Meyer
  * @since 1.2
  */
-@Entity
-@Table(name = "trustbundleanchor")
+@Table("trustbundleanchor")
 public class TrustBundleAnchor 
 {
-    private long id;
-    private TrustBundle trustBundle;
+	@Id
+    private Long id;
+	
+    @Column("trustBundleId")
+    private Long trustBundleId;
+    
+    @Column("anchorData")
     private byte[] anchorData;
+    
     private String thumbprint;
-    private Calendar validStartDate;
-    private Calendar validEndDate;
+    
+    @Column("validStartDate")
+    private LocalDateTime validStartDate;
+    
+    @Column("validEndDate")
+    private LocalDateTime validEndDate;
     
     /**
      * Get the value of id.
      * 
      * @return the value of id.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() 
+    public Long getId() 
     {
         return id;
     }
@@ -78,7 +74,7 @@ public class TrustBundleAnchor
      * @param id
      *            The value of id.
      */
-    public void setId(long id) 
+    public void setId(Long id) 
     {
         this.id = id;
     } 
@@ -88,7 +84,6 @@ public class TrustBundleAnchor
      * 
      * @return the value of thumbprint.
      */
-    @Column(name = "thumbprint", nullable = false)
     public String getThumbprint() 
     {
         return thumbprint;
@@ -106,27 +101,24 @@ public class TrustBundleAnchor
     }    
     
     /**
-     * Get the value of the trust bundle.
+     * Get the value of the trust bundle Id.
      * 
-     * @return the value of trust bundle.
+     * @return the value of trust bundle Id.
      */
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "trustBundleId")
-    @XmlTransient   
-    public TrustBundle getTrustBundle() 
+    public Long getTrustBundleId() 
     {
-        return trustBundle;
+        return trustBundleId;
     }
 
     /**
-     * Set the value of the trust bundle.
+     * Set the value of the trust bundle Id.
      * 
-     * @param trustBundle
-     *            The value of the trust bundle.
+     * @param trustBundleId
+     *            The value of the trust bundle Id.
      */
-    public void setTrustBundle(TrustBundle trustBundle) 
+    public void setTrustBundleId(Long trustBundleId) 
     {
-        this.trustBundle = trustBundle;
+        this.trustBundleId = trustBundleId;
 
     }
     
@@ -135,8 +127,6 @@ public class TrustBundleAnchor
      * 
      * @return the value of anchorData Data.
      */
-    @Column(name = "anchorData", length=4096, nullable = false)
-    @Lob
     public byte[] getData() 
     {
         return anchorData;
@@ -167,9 +157,7 @@ public class TrustBundleAnchor
      * 
      * @return the value of validStartDate.
      */
-    @Column(name = "validStartDate", nullable = false)    
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getValidStartDate() 
+    public LocalDateTime getValidStartDate() 
     {
         return validStartDate;
     }
@@ -180,7 +168,7 @@ public class TrustBundleAnchor
      * @param validStartDate
      *            The value of validStartDate.
      */
-    public void setValidStartDate(Calendar validStartDate) 
+    public void setValidStartDate(LocalDateTime validStartDate) 
     {
         this.validStartDate = validStartDate;
     }
@@ -190,9 +178,7 @@ public class TrustBundleAnchor
      * 
      * @return the value of validEndDate.
      */
-    @Column(name = "validEndDate", nullable = false)    
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getValidEndDate() 
+    public LocalDateTime getValidEndDate() 
     {
         return validEndDate;
     }
@@ -203,7 +189,7 @@ public class TrustBundleAnchor
      * @param validEndDate
      *            The value of validEndDate.
      */
-    public void setValidEndDate(Calendar validEndDate) {
+    public void setValidEndDate(LocalDateTime validEndDate) {
         this.validEndDate = validEndDate;
     }    
     
@@ -216,10 +202,8 @@ public class TrustBundleAnchor
             cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(bais);
             setThumbprint(Thumbprint.toThumbprint(cert).toString());
             
-            final Calendar calEndTime = Calendar.getInstance(Locale.getDefault());
-            calEndTime.setTime(cert.getNotAfter());
-            final Calendar calStartTime = Calendar.getInstance(Locale.getDefault());
-            calStartTime.setTime(cert.getNotBefore());
+            final LocalDateTime calEndTime = new Timestamp(cert.getNotAfter().getTime()).toLocalDateTime();
+            final LocalDateTime calStartTime = new Timestamp(cert.getNotBefore().getTime()).toLocalDateTime();
             
             this.setValidEndDate(calEndTime);
             this.setValidStartDate(calStartTime);

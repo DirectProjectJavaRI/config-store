@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -24,6 +23,8 @@ import org.nhindirect.config.store.util.DNSRecordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.xbill.DNS.Type;
+
+import reactor.test.StepVerifier;
 
 public class DNSRepositoryTest extends SpringBaseTest
 {
@@ -45,19 +46,21 @@ public class DNSRepositoryTest extends SpringBaseTest
 		return FileUtils.readFileToByteArray(fl);
 	}
 	
-	
 	@Before
-	public void cleanDataBase()
+	public void setUp()
 	{
-		dnsRepo.deleteAll();
+		super.setUp();
+		
+		dnsRepo.deleteAll().block();
 	}
 	
 	@Test
 	public void testCleanDatabase() throws Exception 
 	{
-		final List<DNSRecord> records = dnsRepo.findAll();
-		
-		assertEquals(0, records.size());
+		dnsRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 
 	@Test
@@ -73,8 +76,12 @@ public class DNSRepositoryTest extends SpringBaseTest
     	
     	DNSRecord record1 = DNSRecordUtils.createX509CERTRecord("gm2552@securehealthemail.com", 86400L, cert);
     	
-    	dnsRepo.saveAll(Arrays.asList(record1));
-    	List<DNSRecord> records = dnsRepo.findByType(Type.CERT);
+    	dnsRepo.saveAll(Arrays.asList(record1))
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+    	
+    	List<DNSRecord> records = dnsRepo.findByType(Type.CERT).collectList().block();
     	
     	assertEquals(1, records.size());
     	assertEquals(record1, records.iterator().next());
@@ -88,9 +95,12 @@ public class DNSRepositoryTest extends SpringBaseTest
 		
 		// Add 1 record
 		DNSRecord record = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.1"); 
-		dnsRepo.saveAll(Arrays.asList(record));
+		dnsRepo.saveAll(Arrays.asList(record))
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		final Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record.getName());
+		final Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record.getName()).collectList().block();
 		
 		assertEquals(1, records.size());
 		
@@ -107,12 +117,15 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record2 = DNSRecordUtils.createARecord("example2.domain.com", 86400L, "74.22.43.123"); 
 		DNSRecord record3 = DNSRecordUtils.createARecord("sample.domain.com", 86400L, "81.142.48.20"); 
 		
-		dnsRepo.saveAll(Arrays.asList(record1, record2, record3));
+		dnsRepo.saveAll(Arrays.asList(record1, record2, record3))
+		.as(StepVerifier::create) 
+		.expectNextCount(3) 
+		.verifyComplete();
 		
 
 		 //Get by name
 
-		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record1.getName().toUpperCase());
+		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record1.getName().toUpperCase()).collectList().block();
 		
 		assertEquals(1, records.size());
 		
@@ -127,7 +140,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 		/**
 		 *  Move up to biz logic
 		 **/ 
-		records = dnsRepo.findAll();
+		records = dnsRepo.findAll().collectList().block();
 		assertEquals(3, records.size());
 		
 		assertTrue(records.contains(record1));
@@ -137,7 +150,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 
 		 //Get A only
 
-		records = dnsRepo.findByType(Type.A);
+		records = dnsRepo.findByType(Type.A).collectList().block();
 		assertEquals(3, records.size());
 		
 		assertTrue(records.contains(record1));
@@ -147,7 +160,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 		
 		 //Get SRV only
 		 
-		records = dnsRepo.findByType(Type.SRV);
+		records = dnsRepo.findByType(Type.SRV).collectList().block();
 		assertEquals(0, records.size());		
 	}	
 	
@@ -209,14 +222,20 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record1 = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.1"); 
 
 		
-		dnsRepo.saveAll(Arrays.asList(record1));
+		dnsRepo.saveAll(Arrays.asList(record1))
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		DNSRecord record2 = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.2"); 
-		dnsRepo.saveAll(Arrays.asList(record2));
+		dnsRepo.saveAll(Arrays.asList(record2))
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		//Get by name
 		 
-		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record1.getName());
+		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record1.getName()).collectList().block();
 		
 		assertEquals(2, records.size());
 		
@@ -232,12 +251,15 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record1 = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.1"); 
 		DNSRecord record2 = DNSRecordUtils.createARecord("example2.domain.com", 86400L, "127.0.0.1"); 
 		DNSRecord record3 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example.domain.com", 86400L, 3506, 1, 1); 
-		dnsRepo.saveAll(Arrays.asList(record1, record2, record3));
+		dnsRepo.saveAll(Arrays.asList(record1, record2, record3))
+		.as(StepVerifier::create) 
+		.expectNextCount(3) 
+		.verifyComplete();
 
 		
 		 // By A
 		 
-		Collection<DNSRecord> records = dnsRepo.findByType(Type.A);
+		Collection<DNSRecord> records = dnsRepo.findByType(Type.A).collectList().block();
 		
 		assertEquals(2, records.size());
 		assertTrue(records.contains(record1));
@@ -247,7 +269,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 		
 		 // By SRV
 		 
-		records = dnsRepo.findByType(Type.SRV);
+		records = dnsRepo.findByType(Type.SRV).collectList().block();
 		
 		assertEquals(1, records.size());
 		assertTrue(records.contains(record3));
@@ -257,7 +279,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 		/**
 		 *  Move up to biz logic
 		**/ 		
-		records = dnsRepo.findAll();		
+		records = dnsRepo.findAll().collectList().block();		
 		
 		assertEquals(3, records.size());
 		assertTrue(records.contains(record1));
@@ -274,29 +296,32 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record3 = DNSRecordUtils.createARecord("example2.domain.com", 86400L, "127.0.0.3"); 
 		DNSRecord record4 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example.domain.com", 86400L, 3506, 1, 1); 
 		DNSRecord record5 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example2.domain.com", 86400L, 3506, 1, 1);
-		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5));
+		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5))
+		.as(StepVerifier::create) 
+		.expectNextCount(5) 
+		.verifyComplete();
 
-		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record1.getName().toUpperCase());
+		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record1.getName().toUpperCase()).collectList().block();
 		
 		assertEquals(2, records.size());
 		assertTrue(records.contains(record1));
 		assertTrue(records.contains(record2));
 
 
-		records = dnsRepo.findByNameIgnoreCase(record3.getName());
+		records = dnsRepo.findByNameIgnoreCase(record3.getName()).collectList().block();
 		
 		assertEquals(1, records.size());
 		assertTrue(records.contains(record3));
 		
 
-		records = dnsRepo.findByNameIgnoreCase(record4.getName());		
+		records = dnsRepo.findByNameIgnoreCase(record4.getName()).collectList().block();
 		
 		assertEquals(2, records.size());
 		assertTrue(records.contains(record4));
 		assertTrue(records.contains(record5));		
 		
 		
-		records = dnsRepo.findByNameIgnoreCase("bogus.com.");		
+		records = dnsRepo.findByNameIgnoreCase("bogus.com.").collectList().block();
 		
 		assertEquals(0, records.size());
 	}		
@@ -312,24 +337,27 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record3 = DNSRecordUtils.createARecord("example2.domain.com", 86400L, "127.0.0.3"); 
 		DNSRecord record4 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example.domain.com", 86400L, 3506, 1, 1); 
 		DNSRecord record5 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example2.domain.com", 86400L, 3506, 1, 1);
-		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5));
+		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5))
+		.as(StepVerifier::create) 
+		.expectNextCount(5) 
+		.verifyComplete();
 
-		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record3.getName());
+		Collection<DNSRecord> records = dnsRepo.findByNameIgnoreCase(record3.getName()).collectList().block();
 		
 		assertEquals(1, records.size());
-		Optional<DNSRecord> checkRec = dnsRepo.findById(records.iterator().next().getId());
+		DNSRecord checkRec = dnsRepo.findById(records.iterator().next().getId()).block();
 		assertNotNull(checkRec);
-		assertEquals(checkRec.get(), record3);
+		assertEquals(checkRec, record3);
 
 
-		records = dnsRepo.findAll();
+		records = dnsRepo.findAll().collectList().block();
 		assertEquals(5, records.size());
 		List<Long> ids = new ArrayList<>(records.size());
 
 		for (DNSRecord record : records)
 			ids.add(record.getId());
 		
-		records = dnsRepo.findAllById(ids);
+		records = dnsRepo.findAllById(ids).collectList().block();
 		assertEquals(5, records.size());
 		assertTrue(records.contains(record1));
 		assertTrue(records.contains(record2));
@@ -341,7 +369,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 	@Test
 	public void testGetCount() throws Exception 
 	{
-		assertEquals(0, dnsRepo.count());
+		assertEquals(0,  dnsRepo.count().block().intValue());
 		
 		// Add 5 record
 		DNSRecord record1 = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.1");
@@ -349,9 +377,13 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record3 = DNSRecordUtils.createARecord("example2.domain.com", 86400L, "127.0.0.3"); 
 		DNSRecord record4 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example.domain.com", 86400L, 3506, 1, 1); 
 		DNSRecord record5 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example2.domain.com", 86400L, 3506, 1, 1);
-		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5));
+		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5))
+		.as(StepVerifier::create) 
+		.expectNextCount(5) 
+		.verifyComplete();
 
-		assertEquals(5, dnsRepo.count());
+
+		assertEquals(5, dnsRepo.count().block().intValue());
 		
 	}	
 	
@@ -360,7 +392,7 @@ public class DNSRepositoryTest extends SpringBaseTest
 	public void testRemoveByRecords() throws Exception 
 	{
 		
-		assertEquals(0, dnsRepo.count());
+		assertEquals(0, dnsRepo.count().block().intValue());
 		
 		// Add 5 record
 		DNSRecord record1 = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.1");
@@ -368,24 +400,34 @@ public class DNSRepositoryTest extends SpringBaseTest
 		DNSRecord record3 = DNSRecordUtils.createARecord("example2.domain.com", 86400L, "127.0.0.3"); 
 		DNSRecord record4 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example.domain.com", 86400L, 3506, 1, 1); 
 		DNSRecord record5 = DNSRecordUtils.createSRVRecord("_ldap_cerner._tcp.cerner.com", "example2.domain.com", 86400L, 3506, 1, 1);
-		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5));
+		dnsRepo.saveAll(Arrays.asList(record1, record2, record3, record4, record5))
+		.as(StepVerifier::create) 
+		.expectNextCount(5) 
+		.verifyComplete();
 
-		assertEquals(5, dnsRepo.count());
+
+		assertEquals(5, dnsRepo.count().block().intValue());
 		
 		// remove the first three records
-		dnsRepo.deleteAll(Arrays.asList(record1, record2, record3));
+		dnsRepo.deleteAll(Arrays.asList(record1, record2, record3))
+		.as(StepVerifier::create) 
+		.verifyComplete();
 		
 		
-		Collection<DNSRecord> records = dnsRepo.findAll();
+		Collection<DNSRecord> records = dnsRepo.findAll().collectList().block();
 		assertEquals(2, records.size());
 		assertTrue(records.contains(record4));
 		assertTrue(records.contains(record5));
 		
 		// remove the last two records
-		dnsRepo.deleteAll(Arrays.asList(record4, record5));
+		dnsRepo.deleteAll(Arrays.asList(record4, record5))
+		.as(StepVerifier::create) 
+		.verifyComplete();
 		
-		records = dnsRepo.findAll();
-		assertEquals(0, records.size());
+		dnsRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 
 	}		
 	
@@ -393,53 +435,48 @@ public class DNSRepositoryTest extends SpringBaseTest
 	@Test
 	public void testRemoveByIds_noqualifying() throws Exception 
 	{
-		assertEquals(0, dnsRepo.count());
+		assertEquals(0, dnsRepo.count().block().intValue());
 		
 		try
 		{
-			dnsRepo.deleteById(876343L);
+			dnsRepo.deleteById(876343L)
+			.as(StepVerifier::create) 
+			.verifyComplete();
 		}
 		catch (EmptyResultDataAccessException e)
 		{
 			
 		}
 		// should result in a functional no-op
-		assertEquals(0, dnsRepo.count());
+		assertEquals(0, dnsRepo.count().block().intValue());
 	}		
 	
-	
-	@Test
-	public void testRemoveByRecords_noqualifying() throws Exception 
-	{
-		assertEquals(0, dnsRepo.count());
 		
-		DNSRecord record1 = DNSRecordUtils.createARecord("example.domain.com", 86400L, "127.0.0.1");
-		
-		// should result in a functional no-op
-		dnsRepo.delete(record1);
-		
-		assertEquals(0, dnsRepo.count());
-
-	}			
 	
 	@Test
 	public void testUpdateRecord() throws Exception 
 	{
-		assertEquals(0, dnsRepo.count());
+		assertEquals(0, dnsRepo.count().block().intValue());
 		
 
 		DNSRecord record1 = DNSRecordUtils.createMXRecord("example.domain.com", "127.0.0.1", 86400L, 1);
-		dnsRepo.saveAll(Arrays.asList(record1));
+		dnsRepo.saveAll(Arrays.asList(record1))
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<DNSRecord> records = dnsRepo.findAll();
+		Collection<DNSRecord> records = dnsRepo.findAll().collectList().block();
 		assertEquals(1, records.size());
 		DNSRecord checkRecord = records.iterator().next();
 		assertEquals(record1, checkRecord);
 		
 		checkRecord.setName("example2.domain.com.");
-		dnsRepo.save(checkRecord);  
+		dnsRepo.save(checkRecord)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		records = dnsRepo.findAll();
+		records = dnsRepo.findAll().collectList().block();
 		assertEquals(1, records.size());
 		DNSRecord modRecord = records.iterator().next();
 		assertEquals(checkRecord, modRecord);

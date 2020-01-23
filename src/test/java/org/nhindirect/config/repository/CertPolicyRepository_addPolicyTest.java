@@ -3,31 +3,35 @@ package org.nhindirect.config.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Locale;
 
 import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
 import org.nhindirect.policy.PolicyLexicon;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import reactor.test.StepVerifier;
+
 public class CertPolicyRepository_addPolicyTest extends CertPolicyDaoBaseTest
 {
 	@Test
 	public void testAddPolicy_addPolicy_assertAdded()
 	{
-		final Calendar now = Calendar.getInstance(Locale.getDefault());
+		final LocalDateTime now = LocalDateTime.now();
 		
 		final CertPolicy policy = new CertPolicy();
 		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML);
+		policy.setLexicon(PolicyLexicon.XML.ordinal());
 		policy.setPolicyData(new byte[] {1,2,3});
 		
-		polRepo.save(policy);
+		polRepo.save(policy)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		final Collection<CertPolicy> policies = polRepo.findAll();
+		final Collection<CertPolicy> policies = polRepo.findAll().collectList().block();
 		
 		assertEquals(1, policies.size());
 		
@@ -35,7 +39,7 @@ public class CertPolicyRepository_addPolicyTest extends CertPolicyDaoBaseTest
 		
 		assertEquals(policy.getPolicyName(), addedPolicy.getPolicyName());	
 		assertEquals(policy.getLexicon(), addedPolicy.getLexicon());
-		assertTrue(now.getTimeInMillis() <= addedPolicy.getCreateTime().getTimeInMillis());
+		assertTrue(now.compareTo(addedPolicy.getCreateTime()) <= 0);
 		assertTrue(Arrays.equals(policy.getPolicyData(), addedPolicy.getPolicyData()));
 	}
 	
@@ -46,22 +50,25 @@ public class CertPolicyRepository_addPolicyTest extends CertPolicyDaoBaseTest
 		
 		CertPolicy policy = new CertPolicy();
 		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML);
+		policy.setLexicon(PolicyLexicon.XML.ordinal());
 		policy.setPolicyData(new byte[] {1,2,3});
 		
-		polRepo.save(policy);
+		polRepo.save(policy)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<CertPolicy> policies = polRepo.findAll();
+		Collection<CertPolicy> policies = polRepo.findAll().collectList().block();
 		
 		assertEquals(1, policies.size());
 		
 		
 		policy = new CertPolicy();
 		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML);
+		policy.setLexicon(PolicyLexicon.XML.ordinal());
 		policy.setPolicyData(new byte[] {1,2,3});
 		
-		polRepo.save(policy);
+		polRepo.save(policy).block();
 	
 	}	
 }

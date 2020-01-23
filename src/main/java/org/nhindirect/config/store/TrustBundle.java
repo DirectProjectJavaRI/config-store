@@ -24,62 +24,58 @@ package org.nhindirect.config.store;
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
+import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * JPA entity object for a trust bundle
  * @author Greg Meyer
  * @since 1.2
  */
-@Entity
-@Table(name = "trustbundle", indexes=@Index(columnList="bundleName", unique=true))
+@Table("trustbundle")
 public class TrustBundle 
 {
-	private long id;
+	@Id
+	private Long id;
+	
+	@Column("bundleName")
 	private String bundleName;
+	
+	@Column("bundleURL")
 	private String bundleURL;
+	
+	@Column("signingCertificateData")	
     private byte[] signingCertificateData;
-    private Collection<TrustBundleAnchor> trustBundleAnchors;
+	
+	@Column("refreshInterval")	
     private int refreshInterval;
-    private Calendar lastRefreshAttempt;
-    private BundleRefreshError lastRefreshError;
-    private Calendar lastSuccessfulRefresh;    
-    private Calendar createTime;
+	
+	@Column("lastRefreshAttempt")		
+    private LocalDateTime lastRefreshAttempt;
+    
+	@Column("lastRefreshError")	
+    private int lastRefreshError;
+	
+	@Column("lastSuccessfulRefresh")	
+    private LocalDateTime lastSuccessfulRefresh;
+
+	@Column("createTime")	
+    private LocalDateTime createTime;
+	
+	@Column("getCheckSum")	
     private String checkSum;
     
     public TrustBundle()
     {
-    	createTime = Calendar.getInstance(); 
+    	createTime = LocalDateTime.now();
     	refreshInterval = 0;
     	checkSum = "";
     }
     
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() 
+    public Long getId() 
     {
         return id;
     }
@@ -90,7 +86,7 @@ public class TrustBundle
      * @param id
      *            The value of id.
      */
-    public void setId(long id) 
+    public void setId(Long id) 
     {
         this.id = id;
     } 
@@ -101,7 +97,6 @@ public class TrustBundle
      * 
      * @return the value of the bundle name
      */
-    @Column(name = "bundleName", unique = true, nullable = false)
     public String getBundleName()
     {
     	return bundleName;
@@ -123,7 +118,6 @@ public class TrustBundle
      * 
      * @return the value of the bundle URL
      */
-    @Column(name = "bundleURL", nullable = false)
     public String getBundleURL()
     {
     	return bundleURL;
@@ -146,8 +140,6 @@ public class TrustBundle
      * 
      * @return the value of the signing certificate
      */
-    @Column(name = "signingCertificateData", length=4096)
-    @Lob
     public byte[] getSigningCertificateData() 
     {
         return signingCertificateData;
@@ -169,7 +161,6 @@ public class TrustBundle
      * 
      * @return the value of the bundle refresh interval
      */    
-    @Column(name = "refreshInterval")
     public int getRefreshInterval() 
     {
         return refreshInterval;
@@ -191,9 +182,7 @@ public class TrustBundle
      * 
      * @return the value of createTime.
      */
-    @Column(name = "createTime", nullable = false)    
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() 
+    public LocalDateTime getCreateTime() 
     {
         return createTime;
     }
@@ -204,7 +193,7 @@ public class TrustBundle
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) 
+    public void setCreateTime(LocalDateTime timestamp) 
     {
         createTime = timestamp;
     }    
@@ -215,9 +204,7 @@ public class TrustBundle
      * 
      * @return the value of the last successful refresh date time.
      */
-    @Column(name = "lastSuccessfulRefresh")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getLastSuccessfulRefresh() 
+    public LocalDateTime getLastSuccessfulRefresh() 
     {
         return lastSuccessfulRefresh;
     }
@@ -228,7 +215,7 @@ public class TrustBundle
      * @param lastSuccessfulRefresh
      *            The value of the last successful refresh date time
      */    
-    public void setLastSuccessfulRefresh(Calendar lastSuccessfulRefresh) 
+    public void setLastSuccessfulRefresh(LocalDateTime lastSuccessfulRefresh) 
     {
         this.lastSuccessfulRefresh = lastSuccessfulRefresh;
     }  
@@ -240,9 +227,7 @@ public class TrustBundle
      * 
      * @return the value of the last refresh attempt date time
      */
-    @Column(name = "lastRefreshAttempt")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getLastRefreshAttempt() 
+    public LocalDateTime getLastRefreshAttempt() 
     {
         return lastRefreshAttempt;
     }
@@ -253,7 +238,7 @@ public class TrustBundle
      * @param lastRefreshAttempt
      *            The value of the last refresh attempt date time.
      */  
-    public void setLastRefreshAttempt(Calendar lastRefreshAttempt) 
+    public void setLastRefreshAttempt(LocalDateTime lastRefreshAttempt) 
     {
         this.lastRefreshAttempt = lastRefreshAttempt;
     }  
@@ -263,9 +248,7 @@ public class TrustBundle
      * 
      * @return the value of the last refresh error.
      */    
-    @Column(name = "lastRefreshError")
-    @Enumerated
-    public BundleRefreshError getLastRefreshError() 
+    public int getLastRefreshError() 
     {
         return lastRefreshError;
     }
@@ -276,43 +259,17 @@ public class TrustBundle
      * @param lastRefreshError
      *            The value of the last refresh error.
      */     
-    public void setLastRefreshError(BundleRefreshError lastRefreshError) 
+    public void setLastRefreshError(int lastRefreshError) 
     {
     	this.lastRefreshError = lastRefreshError;
     } 
 
-    /**
-     * Get the value of the collection of trust anchors contained within the bundle
-     * 
-     * @return collection of trust anchors contained within the bundle
-     */ 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "trustBundle")
-    public Collection<TrustBundleAnchor> getTrustBundleAnchors() 
-    {
-        if (trustBundleAnchors == null) 
-        {
-        	trustBundleAnchors = new ArrayList<TrustBundleAnchor>();
-        }
-        return trustBundleAnchors;
-    }
-    
-    /**
-     * Set the value of the collection of trust anchors contained within the bundle
-     * 
-     * @param trustBundleAnchors
-     *            The value of the collection of trust anchors contained within the bundle
-     */     
-    public void setTrustBundleAnchors(Collection<TrustBundleAnchor> trustBundleAnchors) 
-    {
-        this.trustBundleAnchors = trustBundleAnchors;
-    }
-    
+
     /**
      * Get the value of the bundle check sum.  
      * 
      * @return collection of the bundle check sum.  
      */ 
-    @Column(name = "getCheckSum", nullable = false)
     public String getCheckSum()
     {
     	return checkSum;

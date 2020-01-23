@@ -17,23 +17,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package org.nhindirect.config.store;
 
 import java.io.IOException;
-import java.util.Calendar;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.time.LocalDateTime;
 
 import org.bouncycastle.util.Arrays;
 import org.nhindirect.config.store.util.DNSRecordUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "dnsrecord")
 /**
  * The JPA Domain class representing a DNS record.  This is a generic DNS record that can represent (in theory) any
  * DNS record type.
@@ -41,29 +32,30 @@ import org.nhindirect.config.store.util.DNSRecordUtils;
  * @author Greg Meyer
  * @since 1.1
  */
+@Table("dnsrecord")
 public class DNSRecord 
 {
-    private long id;
+	@Id
+    private Long id;
 	private String name;
 	private int type;
 	private int dclass;
 	private long ttl;
 	private byte[] data;
-    private Calendar createTime;
+	
+	@Column("createTime")
+    private LocalDateTime createTime;
     
     public DNSRecord()
     {
-    	this.createTime = Calendar.getInstance();
+    	this.createTime = LocalDateTime.now();
     }
     
     /**
      * Gets the internal id of the record.  The record id is the primary key of the record JPA store.
      * @return The internal id of the record.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)	
-	public long getId() 
+	public Long getId() 
 	{
 		return id;
 	}
@@ -72,7 +64,7 @@ public class DNSRecord
      * Sets the internal id of the record.
      * @param id  The internal id of the record.
      */
-	public void setId(long id) 
+	public void setId(Long id) 
 	{
 		this.id = id;  
 	}
@@ -81,7 +73,6 @@ public class DNSRecord
 	 * Gets the name associated with this DNS entry.  The is generally the name that is used for lookup purposes.
 	 * @return The name associated with this DNS entry.
 	 */
-    @Column(name = "name")
 	public String getName() 
 	{
 		return name;
@@ -100,7 +91,6 @@ public class DNSRecord
 	 * Gets the type of the DNS record such as A, SRV, CERT, MX, and SOA. 
 	 * @return The type of the DNS record.
 	 */
-    @Column(name = "type")
 	public int getType() 
 	{
 		return type;
@@ -119,7 +109,6 @@ public class DNSRecord
 	 * Gets the DNS record class such as IN, HS, and CH.
 	 * @return The DNS record class.
 	 */
-    @Column(name = "dclass")
 	public int getDclass() 
 	{
 		return dclass;
@@ -138,7 +127,6 @@ public class DNSRecord
 	 * Gets the record time to live in seconds.  The ttl represents how long a record can cached before it is considered stale.
 	 * @return The record time to live in seconds.
 	 */
-    @Column(name = "ttl")
 	public long getTtl() 
 	{
 		return ttl;
@@ -158,12 +146,10 @@ public class DNSRecord
      * 
      * @return Gets the date/time the record was created.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createTime")
-    public Calendar getCreateTime() 
+    public LocalDateTime getCreateTime() 
     {
     	if (createTime == null)
-    		setCreateTime(Calendar.getInstance());
+    		setCreateTime(LocalDateTime.now());
     	
         return createTime;
     }
@@ -173,7 +159,7 @@ public class DNSRecord
      * 
      * @param timestamp The date/time the record was created.
      */
-    public void setCreateTime(Calendar timestamp) 
+    public void setCreateTime(LocalDateTime timestamp) 
     {
     	createTime = timestamp;
     }	
@@ -182,8 +168,6 @@ public class DNSRecord
      * Get the rdata of the record.  Rdata is generally the value of a DNS lookup such an IP address for an A lookup or an X509 certificate for a CERT lookup.
      * @return The Rdata of the record.
      */
-    @Column(name = "data", length=8192)
-    @Lob	
 	public byte[] getData() 
 	{
 		return data;

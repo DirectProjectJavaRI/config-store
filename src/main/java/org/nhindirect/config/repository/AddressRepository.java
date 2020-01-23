@@ -24,22 +24,30 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.Address;
-import org.nhindirect.config.store.Domain;
 import org.nhindirect.config.store.EntityStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
-public interface AddressRepository extends JpaRepository<Address, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface AddressRepository extends ReactiveCrudRepository<Address, Long>
 {
-	public Address findByEmailAddressIgnoreCase(String emailAddress);
+	@Query("select * from address a where upper(a.emailAddress) = upper(:emailAddress)")
+	public Mono<Address> findByEmailAddressIgnoreCase(String emailAddress);
 	
-	public List<Address> findByEndpointIgnoreCase(String endpoint);
+	@Query("select * from address a where upper(a.endpoint) = upper(:endpoint)")
+	public Flux<Address> findByEndpointIgnoreCase(String endpoint);
 	
-	@Query("select a from Address a where upper(a.emailAddress) in :emailAddresses and a.status = :status")
-	public List<Address> findByEmailAddressInIgnoreCaseAndStatus(@Param("emailAddresses") List<String> emailAddresses, @Param("status") EntityStatus status);
+	@Query("select * from address a where upper(a.emailAddress) in (:emailAddresses) and a.status = :status")
+	public Flux<Address> findByEmailAddressInIgnoreCaseAndStatus(List<String> emailAddresses, EntityStatus status);
 	
-	public List<Address> findByDomain(Domain domain);
+	@Query("select * from address a where a.domainId = :domainId")
+	public Flux<Address> findByDomainId(Long domainId);
 	
-	public void deleteByEmailAddressIgnoreCase(String emailAddress);
+	@Query("delete from address where domainId = :domainId")
+	public Mono<Void> deleteByDomainId(Long domainId);
+	
+	@Query("delete from address where upper(emailAddress) = upper(:emailAddress)")
+	public Mono<Void> deleteByEmailAddressIgnoreCase(String emailAddress);
 }

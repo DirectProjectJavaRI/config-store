@@ -24,20 +24,24 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.Setting;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface SettingRepository extends JpaRepository<Setting, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface SettingRepository extends ReactiveCrudRepository<Setting, Long>
 {
-	@Query("select s from Setting s where upper(s.name) in :names")
-	public List<Setting> findByNameIgnoreCaseIn(@Param("names") List<String> names);
+	@Query("select * from setting s where upper(s.name) in (:names)")
+	public Flux<Setting> findByNameIgnoreCaseIn(List<String> names);
 	
-	public Setting findByNameIgnoreCase(String name);
+	@Query("select * from setting s where upper(s.name) = upper(:name)")
+	public Mono<Setting> findByNameIgnoreCase(String name);
 	
 	@Transactional
-	public void deleteByNameIgnoreCase(String name);
+	@Query("delete from setting where upper(name) = upper(:name)")
+	public Mono<Void> deleteByNameIgnoreCase(String name);
 	
 }
 

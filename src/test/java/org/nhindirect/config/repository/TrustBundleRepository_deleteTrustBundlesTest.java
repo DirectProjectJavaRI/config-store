@@ -2,14 +2,14 @@ package org.nhindirect.config.repository;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Iterator;
-
+import java.util.List;
 
 import org.junit.Test;
 import org.nhindirect.config.store.TrustBundle;
+
+import reactor.test.StepVerifier;
 
 public class TrustBundleRepository_deleteTrustBundlesTest extends TrustBundleDaoBaseTest
 {
@@ -22,17 +22,22 @@ public class TrustBundleRepository_deleteTrustBundlesTest extends TrustBundleDao
 		bundle.setBundleURL("http://testBundle/bundle.p7b");
 		bundle.setRefreshInterval(5);
 		bundle.setCheckSum("12345");
-		bundle.setCreateTime(Calendar.getInstance());
+		bundle.setCreateTime(LocalDateTime.now());
 		
-		tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundle> bundles = tbRepo.findAll();
+		List<TrustBundle> bundles = tbRepo.findAll().collectList().block();
 		
 		assertEquals(1, bundles.size());
 		
-		tbRepo.deleteAll(bundles);
+		tbRepo.deleteAll(bundles)
+		.as(StepVerifier::create) 
+		.verifyComplete();
 		
-		bundles = tbRepo.findAll();
+		bundles = tbRepo.findAll().collectList().block();
 		
 		assertEquals(0, bundles.size());
 	}
@@ -46,26 +51,34 @@ public class TrustBundleRepository_deleteTrustBundlesTest extends TrustBundleDao
 		bundle.setBundleURL("http://testBundle/bundle.p7b");
 		bundle.setRefreshInterval(5);
 		bundle.setCheckSum("12345");
-		bundle.setCreateTime(Calendar.getInstance());
+		bundle.setCreateTime(LocalDateTime.now());
 		
-		tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		bundle = new TrustBundle();
 		bundle.setBundleName("Test Bundle2");
 		bundle.setBundleURL("http://testBundle/bundle2.p7b");
 		bundle.setRefreshInterval(5);
 		bundle.setCheckSum("67890");
-		bundle.setCreateTime(Calendar.getInstance());
+		bundle.setCreateTime(LocalDateTime.now());
 		
-		tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundle> bundles = tbRepo.findAll();
+		Collection<TrustBundle> bundles = tbRepo.findAll().collectList().block();
 		
 		assertEquals(2, bundles.size());
 		
-		tbRepo.deleteById(bundles.iterator().next().getId());
+		tbRepo.deleteById(bundles.iterator().next().getId())
+		.as(StepVerifier::create) 
+		.verifyComplete();
 		
-		bundles = tbRepo.findAll();
+		bundles = tbRepo.findAll().collectList().block();
 		
 		assertEquals(1, bundles.size());
 	}
@@ -79,27 +92,34 @@ public class TrustBundleRepository_deleteTrustBundlesTest extends TrustBundleDao
 		bundle.setBundleURL("http://testBundle/bundle.p7b");
 		bundle.setRefreshInterval(5);
 		bundle.setCheckSum("12345");
-		bundle.setCreateTime(Calendar.getInstance());
+		bundle.setCreateTime(LocalDateTime.now());
 		
-		tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		bundle = new TrustBundle();
 		bundle.setBundleName("Test Bundle2");
 		bundle.setBundleURL("http://testBundle/bundle2.p7b");
 		bundle.setRefreshInterval(5);
 		bundle.setCheckSum("67890");
-		bundle.setCreateTime(Calendar.getInstance());
+		bundle.setCreateTime(LocalDateTime.now());
 		
-		tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundle> bundles = tbRepo.findAll();
+		List<TrustBundle> bundles = tbRepo.findAll().collectList().block();
 		
 		assertEquals(2, bundles.size());
 		
-		Iterator<TrustBundle> iter = bundles.iterator();
-		tbRepo.deleteAll(Arrays.asList(iter.next(), iter.next()));
+		tbRepo.deleteAll()
+		.as(StepVerifier::create) 
+		.verifyComplete();
 		
-		bundles = tbRepo.findAll();
+		bundles = tbRepo.findAll().collectList().block();
 		
 		assertEquals(0, bundles.size());
 	}	

@@ -9,6 +9,8 @@ import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
 
+import reactor.test.StepVerifier;
+
 public class CertPolicyGroupDomainReltnRepository_associatePolicyGroupToDomainTest extends CertPolicyDaoBaseTest
 {
 	@Test
@@ -16,22 +18,31 @@ public class CertPolicyGroupDomainReltnRepository_associatePolicyGroupToDomainTe
 	{
 		Domain domain = new Domain();
 		domain.setDomainName("Test Domain");
-		domain = dmRepo.save(domain);
+		dmRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		CertPolicyGroup group = new CertPolicyGroup();
 		group.setPolicyGroupName("Test Group");
-		group = groupRepo.save(group);
+		groupRepo.save(group)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroup(group);
-		reltn.setDomain(domain);
+		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setDomainId(domain.getId());
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		final Collection<CertPolicyGroupDomainReltn> groupReltn = reltnRepo.findByDomain(domain);
+		final Collection<CertPolicyGroupDomainReltn> groupReltn = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(1, groupReltn.size());
 		reltn = groupReltn.iterator().next();
-		assertEquals(group.getPolicyGroupName(), reltn.getCertPolicyGroup().getPolicyGroupName());
-		assertEquals(domain.getDomainName(), reltn.getDomain().getDomainName());
+		assertEquals(group.getId(), reltn.getCertPolicyGroupId());
+		assertEquals(domain.getId(), reltn.getDomainId());
 	}
 }

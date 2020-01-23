@@ -24,28 +24,34 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.Domain;
-import org.nhindirect.config.store.EntityStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface DomainRepository extends JpaRepository<Domain, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface DomainRepository extends ReactiveCrudRepository<Domain, Long>
 {
-	public Domain findByDomainNameIgnoreCase(String domainName);
+	@Query("select * from domain d where upper(d.domainName) = upper(:domainName)")
+	public Mono<Domain> findByDomainNameIgnoreCase(String domainName);
 	
-	public List<Domain> findByDomainNameContainingIgnoreCase(String domainName);
+	@Query("select * from domain d where upper(d.domainName) like :domainName")
+	public Flux<Domain> findByDomainNameContainingIgnoreCase(String domainName);
 	
-	public List<Domain> findByDomainNameContainingIgnoreCaseAndStatus(String domainName,  EntityStatus status);
+	@Query("select * from domain d where upper(d.domainName) like upper(:domainName) and d.status = :status")
+	public Flux<Domain> findByDomainNameContainingIgnoreCaseAndStatus(String domainName,  int status);
 	
-	@Query("select d from Domain d where upper(d.domainName) in :domainNames")
-	public List<Domain> findByDomainNameInIgnoreCase(@Param("domainNames") List<String> domainNames);
+	@Query("select * from domain d where upper(d.domainName) in (:domainNames)")
+	public Flux<Domain> findByDomainNameInIgnoreCase(List<String> domainNames);
 	
-	@Query("select d from Domain d where upper(d.domainName) in :domainNames and d.status = :status")
-	public List<Domain> findByDomainNameInIgnoreCaseAndStatus(@Param("domainNames") List<String> domainNames, @Param("status") EntityStatus status);
+	@Query("select * from domain d where upper(d.domainName) in (:domainNames) and d.status = :status")
+	public Flux<Domain> findByDomainNameInIgnoreCaseAndStatus(List<String> domainNames, int status);
 	
-	public List<Domain> findByStatus(EntityStatus status);	
+	@Query("select * from domain d where d.status = :status")
+	public Flux<Domain> findByStatus(int status);	
 	
 	@Transactional
-	public void deleteByDomainNameIgnoreCase(String domainName);
+	@Query("delete from domain where upper(domainName) = upper(:domainName)")
+	public Mono<Void> deleteByDomainNameIgnoreCase(String domainName);
 }

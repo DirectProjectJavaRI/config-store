@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import java.io.File;
-import java.util.Collection;
-
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -16,6 +14,8 @@ import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.model.utils.CertUtils;
 import org.nhindirect.config.store.Certificate;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import reactor.test.StepVerifier;
 
 
 public class CertificateDao_stripP12ProtectionNoManagerTest extends SpringBaseTest
@@ -41,7 +41,7 @@ public class CertificateDao_stripP12ProtectionNoManagerTest extends SpringBaseTe
 	@Before
 	public void cleanDataBase()
 	{
-		repo.deleteAll();
+		repo.deleteAll().block();
 	}
 	
 	
@@ -56,7 +56,10 @@ public class CertificateDao_stripP12ProtectionNoManagerTest extends SpringBaseTe
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create)
+		.expectNextCount(1)
+		.verifyComplete();
 		
 		return cert;
 	}
@@ -66,10 +69,7 @@ public class CertificateDao_stripP12ProtectionNoManagerTest extends SpringBaseTe
 	{
 		populateCert("gm2552.der", "gm2552Key.der");
 				
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
-		
-		Certificate cert = certificates.iterator().next();
+		Certificate cert = repo.findAll().blockFirst();
 		
 		assertTrue(cert.isPrivateKey());
 		final byte[] certData = CertificateRepositoryTest.loadPkcs12FromCertAndKey("gm2552.der", "gm2552Key.der");
@@ -85,10 +85,7 @@ public class CertificateDao_stripP12ProtectionNoManagerTest extends SpringBaseTe
 	{
 		populateCert("gm2552.der", null);
 				
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
-		
-		Certificate cert = certificates.iterator().next();
+		Certificate cert = repo.findAll().blockFirst();
 		
 		assertFalse(cert.isPrivateKey());
 		final byte[] certData = loadCertificateData("gm2552.der");
@@ -110,13 +107,13 @@ public class CertificateDao_stripP12ProtectionNoManagerTest extends SpringBaseTe
 		addCert.setData(CertUtils.certAndWrappedKeyToRawByteFormat(keyData, CertUtils.toX509Certificate(certData)));
 		addCert.setOwner("gm2552@cerner.com");
 		
-		repo.save(addCert);
+		repo.save(addCert)
+		.as(StepVerifier::create)
+		.expectNextCount(1)
+		.verifyComplete();
 
 		
-		final Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
-		
-		final Certificate cert = certificates.iterator().next();
+		final Certificate cert = repo.findAll().blockFirst();
 		
 		assertTrue(cert.isPrivateKey());
 

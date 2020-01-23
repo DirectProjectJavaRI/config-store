@@ -21,51 +21,37 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.config.store;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
+import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-
-@Entity
-@Table(name = "domain")
 /**
  * The JPA Domain class
  */
-@XmlRootElement
-public class Domain {
+@Table
+public class Domain 
+{
 
-	private static long MAGIC_POSTMASTER_ID = -2;
+	public static long MAGIC_POSTMASTER_ID = -2;
 	
+	@Column("domainName")
     private String domainName;
 
-    private Calendar createTime;
+    @Column("createTime")
+    private LocalDateTime createTime;
 
-    private Calendar updateTime;
+    @Column("updateTime")
+    private LocalDateTime updateTime;
 
+    @Column("postmasterAddressId")
     private Long postmasterAddressId;
 
-    private Collection<Address> addresses;
-
+    @Id
     private Long id;
 
-    private EntityStatus status = EntityStatus.NEW;
+    private int status = EntityStatus.NEW.ordinal();
 
     /**
      * Construct a Domain.
@@ -81,9 +67,9 @@ public class Domain {
      */
     public Domain(String aName) {
         setDomainName(aName);
-        setCreateTime(Calendar.getInstance());
-        setUpdateTime(Calendar.getInstance());
-        setStatus(EntityStatus.NEW);
+        setCreateTime(LocalDateTime.now());
+        setUpdateTime(LocalDateTime.now());
+        setStatus(EntityStatus.NEW.ordinal());
     }
 
     /**
@@ -91,14 +77,8 @@ public class Domain {
      * 
      * @return the value of id.
      */
-    @Column(name = "id", nullable = false)
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @XmlAttribute
-    public Long getId() {
-        if (id == null) {
-            setId(new Long(0L));
-        }
+    public Long getId() 
+    {
         return id;
     }
 
@@ -117,7 +97,6 @@ public class Domain {
      * 
      * @return the value of domainName.
      */
-    @Column(name = "domainName", unique = true)
     public String getDomainName() {
         return domainName;
     }
@@ -127,8 +106,7 @@ public class Domain {
      * 
      * @return the value of createTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
@@ -137,7 +115,6 @@ public class Domain {
      * 
      * @return the value of postmasterAddressId.
      */
-    @Column(name = "postmasterAddressId")
     public Long getPostmasterAddressId() {
         return postmasterAddressId;
     }
@@ -157,8 +134,7 @@ public class Domain {
      * 
      * @return the value of updateTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
@@ -167,10 +143,7 @@ public class Domain {
      * 
      * @return the value of status.
      */
-    @Column(name = "status")
-    @Enumerated
-    @XmlAttribute
-    public EntityStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -190,7 +163,7 @@ public class Domain {
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) {
+    public void setCreateTime(LocalDateTime timestamp) {
         createTime = timestamp;
     }
 
@@ -200,7 +173,7 @@ public class Domain {
      * @param timestamp
      *            The value of updateTime.
      */
-    public void setUpdateTime(Calendar timestamp) {
+    public void setUpdateTime(LocalDateTime timestamp) {
 
         updateTime = timestamp;
     }
@@ -211,96 +184,8 @@ public class Domain {
      * @param aStatus
      *            The value of status.
      */
-    public void setStatus(EntityStatus aStatus) {
+    public void setStatus(int aStatus) {
         status = aStatus;
-    }
-
-    /**
-     * If we have an email address id, then search through the collection of
-     * addresses to find an id match and return it.
-     * 
-     * @return the postmaster email address.
-     */
-    @Transient
-    public String getPostMasterEmail() {
-        String result = null;
-        // return the address that matched the ID
-        if ((getAddresses().size() > 0) && (getPostmasterAddressId() != null)) {
-            for (Address address : getAddresses()) {
-                if (address.getId().equals(getPostmasterAddressId())) {
-                    result = address.getEmailAddress();
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Process according to the following table: <p>
-     *           id       name      action<br>
-     *           0/Null   0/Null    None<br>
-     *           Not Null 0/Null    Set Id to null.  Don't remove the Address<br>
-     *           0/Null   Not Null  Add to Address if not there, set Id<br>
-     *           Not Null Not Null  if id.address = address then None, otherwise update id </p>
-     * 
-     * @param email
-     *            The postmaster email address.
-     */
-    public void setPostMasterEmail(String email) {
-
-        if (email == null) {
-            if (getPostmasterAddressId() != null) {
-                setPostmasterAddressId(null);
-            }
-        } else {
-            Long addressId = null;
-            boolean matched = false;
-            // Check to see if we've already got the address
-            for (Address address : getAddresses()) {
-                if (address.getEmailAddress().equals(email)) {
-                    addressId = address.getId();
-                    matched = true;
-                    break;
-                }
-            }
-
-            if (!matched) { // It's a new address so add it
-                Address postmaster = new Address(this, email);
-                postmaster.setDisplayName("Postmaster");
-                postmaster.setStatus(EntityStatus.NEW);
-                postmaster.setId(MAGIC_POSTMASTER_ID);
-                getAddresses().add(postmaster);
-                addressId = postmaster.getId();
-            }
-
-            setPostmasterAddressId(addressId);
-        }
-        return;
-    }
-
-    /**
-     * Get a colection of addresses.
-     * 
-     * @return a collection of addresses.
-     */
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "domain")
-    @XmlElement(name = "address")
-    public Collection<Address> getAddresses() {
-        if (addresses == null) {
-            addresses = new ArrayList<Address>();
-        }
-        return addresses;
-    }
-
-    /**
-     * Set the value of addresses.
-     * 
-     * @param addresses
-     *            the value of addresses
-     */
-    public void setAddresses(Collection<Address> addresses) {
-        this.addresses = addresses;
     }
 
     /**
@@ -308,13 +193,12 @@ public class Domain {
      * 
      * @return true if the Domain is valid, false otherwise.
      */
-    @Transient
     public boolean isValid() {
         boolean result = false;
         if ((getDomainName() != null)
                 && (getDomainName().length() > 0)
-                && ((getStatus().equals(EntityStatus.ENABLED)) || (getStatus().equals(EntityStatus.DISABLED)) || ((getStatus()
-                        .equals(EntityStatus.NEW)) && (getId() == 0L)))) {
+                && ((getStatus() == EntityStatus.ENABLED.ordinal())) || (getStatus()  == EntityStatus.DISABLED.ordinal()) || ((getStatus()
+                        == EntityStatus.NEW.ordinal()) && (getId() == 0L))) {
             result = true;
         }
 
@@ -328,8 +212,7 @@ public class Domain {
      */
     @Override
     public String toString() {
-        return "[ID: " + getId() + " | Domain: " + getDomainName() + " | Status: " + getStatus().toString()
-                + " | Addresses: " + getAddresses().size() + "]";
+        return "[ID: " + getId() + " | Domain: " + getDomainName() + " | Status: " + EntityStatus.values()[getStatus()].toString() + "]";
     }
 
     @Override
@@ -343,12 +226,9 @@ public class Domain {
     	{
     		final Domain otherDomain = (Domain)other;
     		if (otherDomain.id == this.id && otherDomain.domainName.equals(domainName) && otherDomain.postmasterAddressId == postmasterAddressId
-    				&& otherDomain.status.equals(status))
+    				&& otherDomain.status == status)
     		{
-    			if (otherDomain.addresses == null && addresses == null)
     				result = true;
-    			else if (otherDomain.addresses != null && addresses != null)
-    				result = otherDomain.addresses.size() == addresses.size();
     		}
     	}
     	

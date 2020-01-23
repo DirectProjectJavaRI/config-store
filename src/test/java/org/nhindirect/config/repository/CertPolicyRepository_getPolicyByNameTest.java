@@ -1,23 +1,26 @@
 package org.nhindirect.config.repository;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Locale;
 
 import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
 import org.nhindirect.policy.PolicyLexicon;
+
+import reactor.test.StepVerifier;
 
 public class CertPolicyRepository_getPolicyByNameTest extends CertPolicyDaoBaseTest
 {
 	@Test
 	public void testGetPolicyByName_emptyStore_assertNoPolicyReturned()
 	{
-		assertNull(polRepo.findByPolicyNameIgnoreCase("Test Policy"));
+		polRepo.findByPolicyNameIgnoreCase("Test Policy")
+		.as(StepVerifier::create) 
+		.expectNextCount(0) 
+		.verifyComplete();
 	}
 	
 	@Test
@@ -25,32 +28,41 @@ public class CertPolicyRepository_getPolicyByNameTest extends CertPolicyDaoBaseT
 	{
 		final CertPolicy policy = new CertPolicy();
 		policy.setPolicyName("Test Policy");
-		policy.setLexicon(PolicyLexicon.XML);
+		policy.setLexicon(PolicyLexicon.XML.ordinal());
 		policy.setPolicyData(new byte[] {1,2,3});
 		
-		polRepo.save(policy);
+		polRepo.save(policy)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		
-		assertNull(polRepo.findByPolicyNameIgnoreCase("Test Policy X"));
+		polRepo.findByPolicyNameIgnoreCase("Test Policy X")
+		.as(StepVerifier::create) 
+		.expectNextCount(0) 
+		.verifyComplete();
 	}
 	
 	@Test
 	public void testGetPolicyByName_singlePolicyInStore_assertPolicyReturned()
 	{
-		final Calendar now = Calendar.getInstance(Locale.getDefault());
+		final LocalDateTime now = LocalDateTime.now();
 		
 		final CertPolicy policy = new CertPolicy();
 		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML);
+		policy.setLexicon(PolicyLexicon.XML.ordinal());
 		policy.setPolicyData(new byte[] {1,2,3});
 		
-		polRepo.save(policy);
+		polRepo.save(policy)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		CertPolicy addedPolicy = polRepo.findByPolicyNameIgnoreCase("Test POLicY");
+		CertPolicy addedPolicy = polRepo.findByPolicyNameIgnoreCase("Test POLicY").block();
 		
 		assertEquals(policy.getPolicyName(), addedPolicy.getPolicyName());	
 		assertEquals(policy.getLexicon(), addedPolicy.getLexicon());
-		assertTrue(now.getTimeInMillis() <= addedPolicy.getCreateTime().getTimeInMillis());
+		assertTrue(now.compareTo(addedPolicy.getCreateTime()) <= 0);
 		assertTrue(Arrays.equals(policy.getPolicyData(), addedPolicy.getPolicyData()));
 	}	
 	

@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.springframework.transaction.annotation.Transactional;
 
+import reactor.test.StepVerifier;
+
 @Transactional
 public class CertPolicyGroupRepository_deletePolicyGroupsTest extends CertPolicyDaoBaseTest
 {
@@ -19,15 +21,18 @@ public class CertPolicyGroupRepository_deletePolicyGroupsTest extends CertPolicy
 		final CertPolicyGroup group = new CertPolicyGroup();
 		group.setPolicyGroupName("Test Group");
 
-		groupRepo.save(group);
+		groupRepo.save(group)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<CertPolicyGroup> groups = groupRepo.findAll();
+		Collection<CertPolicyGroup> groups = groupRepo.findAll().collectList().block();
 		
 		assertEquals(1, groups.size());
 		
-		groupRepo.deleteById(groups.iterator().next().getId());
+		groupRepo.deleteById(groups.iterator().next().getId()).block();
 		
-		groups = groupRepo.findAll();
+		groups = groupRepo.findAll().collectList().block();
 		
 		assertEquals(0, groups.size());
 	}
@@ -39,21 +44,27 @@ public class CertPolicyGroupRepository_deletePolicyGroupsTest extends CertPolicy
 		final CertPolicyGroup group1 = new CertPolicyGroup();
 		group1.setPolicyGroupName("Test Group1");
 		
-		groupRepo.save(group1);
+		groupRepo.save(group1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		// add policy 2
 		final CertPolicyGroup group2 = new CertPolicyGroup();
 		group2.setPolicyGroupName("Test Group2");
 		
-		groupRepo.save(group2);
+		groupRepo.save(group2)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<CertPolicyGroup> groups = groupRepo.findAll();
+		Collection<CertPolicyGroup> groups = groupRepo.findAll().collectList().block();
 		
 		assertEquals(2, groups.size());
 		
-		groupRepo.deleteById(groups.iterator().next().getId());
+		groupRepo.deleteById(groups.iterator().next().getId()).block();
 		
-		groups = groupRepo.findAll();
+		groups = groupRepo.findAll().collectList().block();
 		
 		assertEquals(1, groups.size());
 	}
@@ -65,23 +76,29 @@ public class CertPolicyGroupRepository_deletePolicyGroupsTest extends CertPolicy
 		final CertPolicyGroup group1 = new CertPolicyGroup();
 		group1.setPolicyGroupName("Test Group1");
 		
-		groupRepo.save(group1);
+		groupRepo.save(group1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		// add policy 2
 		final CertPolicyGroup group2 = new CertPolicyGroup();
 		group2.setPolicyGroupName("Test Group2");
 		
-		groupRepo.save(group2);
+		groupRepo.save(group2)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<CertPolicyGroup> groups = groupRepo.findAll();
+		Collection<CertPolicyGroup> groups = groupRepo.findAll().collectList().block();
 		
 		assertEquals(2, groups.size());
 		
 		Iterator<CertPolicyGroup> iter = groups.iterator();
 		
-		groupRepo.deleteByIdIn(Arrays.asList(iter.next().getId(), iter.next().getId()));
+		groupRepo.deleteByIdIn(Arrays.asList(iter.next().getId(), iter.next().getId())).block();
 		
-		groups = groupRepo.findAll();
+		groups = groupRepo.findAll().collectList().block();
 		
 		assertEquals(0, groups.size());
 	}	
