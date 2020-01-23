@@ -2,120 +2,48 @@ package org.nhindirect.config.repository;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.Test;
 import org.nhindirect.config.store.TrustBundle;
 import org.nhindirect.config.store.TrustBundleAnchor;
+
+import reactor.test.StepVerifier;
 
 public class TrustBundleRepository_updateTrustBundleAnchorsTest extends TrustBundleDaoBaseTest
 {
 	@Test
 	public void testUpdateTrustBundleAnchors_addNewAnchors_assertNewAnchors() throws Exception
 	{
-		final TrustBundle bundle = new TrustBundle();
+		TrustBundle bundle = new TrustBundle();
 		bundle.setBundleName("Test Bundle");
 		bundle.setBundleURL("http://testBundle/bundle.p7b");
 		bundle.setRefreshInterval(5);
 		bundle.setCheckSum("12345");
-		bundle.setCreateTime(Calendar.getInstance());
+		bundle.setCreateTime(LocalDateTime.now());
 		
-		tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
+		bundle = tbRepo.findAll().collectList().block().get(0);
 		
 		final TrustBundleAnchor anchor = new TrustBundleAnchor();
 		anchor.setData(loadCertificateData("secureHealthEmailCACert.der"));
-		anchor.setTrustBundle(bundle);
+		anchor.setTrustBundleId(bundle.getId());
 		
-		bundle.setTrustBundleAnchors(Arrays.asList(anchor));
-		bundle.setCheckSum("6789");
-
-		tbRepo.save(bundle);
+		tbAncRepo.save(anchor)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		final TrustBundle addedBundle = tbRepo.findById(bundle.getId()).get();
-		assertEquals(1, addedBundle.getTrustBundleAnchors().size());
+		final List<TrustBundleAnchor> addedAnchors = tbAncRepo.findByTrustBundleId(bundle.getId()).collectList().block();
+		assertEquals(1, addedAnchors.size());
 		
-		final TrustBundleAnchor addedAnchor = addedBundle.getTrustBundleAnchors().iterator().next();
+		final TrustBundleAnchor addedAnchor = addedAnchors.get(0);
 		assertEquals(anchor.toCertificate(), addedAnchor.toCertificate());
 	}
 	
-	@Test
-	public void testUpdateTrustBundleAnchors_addAdditionalAnchors_assertNewAnchors() throws Exception
-	{
-		final TrustBundle bundle = new TrustBundle();
-		bundle.setBundleName("Test Bundle");
-		bundle.setBundleURL("http://testBundle/bundle.p7b");
-		bundle.setRefreshInterval(5);
-		bundle.setCheckSum("12345");
-		bundle.setCreateTime(Calendar.getInstance());
-		
-		TrustBundleAnchor anchor = new TrustBundleAnchor();
-		anchor.setData(loadCertificateData("secureHealthEmailCACert.der"));
-		anchor.setTrustBundle(bundle);
-		
-		bundle.setTrustBundleAnchors(Arrays.asList(anchor));
-		
-		tbRepo.save(bundle);
-		
-		final TrustBundleAnchor additionalAnchor = new TrustBundleAnchor();
-		additionalAnchor.setData(loadCertificateData("umesh.der"));
-		additionalAnchor.setTrustBundle(bundle);
-		
-		Collection<TrustBundleAnchor> newAnchors = new ArrayList<>(bundle.getTrustBundleAnchors());
-		newAnchors.add(additionalAnchor);
-		bundle.setTrustBundleAnchors(newAnchors);
-		bundle.setCheckSum("6789");
-		tbRepo.save(bundle);
-		
-		final TrustBundle addedBundle = tbRepo.findById(bundle.getId()).get();
-		assertEquals("6789", addedBundle.getCheckSum());
-		assertEquals(2, addedBundle.getTrustBundleAnchors().size());
-		
-		Iterator<TrustBundleAnchor> iter = addedBundle.getTrustBundleAnchors().iterator();
-		
-		TrustBundleAnchor addedAnchor = iter.next();
-		assertEquals(anchor.toCertificate(), addedAnchor.toCertificate());
-		
-		addedAnchor = iter.next();
-		assertEquals(additionalAnchor.toCertificate(), addedAnchor.toCertificate());
-	}	
-	
-	@Test
-	public void testUpdateTrustBundleAnchors_addSwapAnchors_assertNewAnchors() throws Exception
-	{
-		final TrustBundle bundle = new TrustBundle();
-		bundle.setBundleName("Test Bundle");
-		bundle.setBundleURL("http://testBundle/bundle.p7b");
-		bundle.setRefreshInterval(5);
-		bundle.setCheckSum("12345");
-		bundle.setCreateTime(Calendar.getInstance());
-		
-		TrustBundleAnchor anchor = new TrustBundleAnchor();
-		anchor.setData(loadCertificateData("secureHealthEmailCACert.der"));
-		anchor.setTrustBundle(bundle);
-		
-		bundle.setTrustBundleAnchors(Arrays.asList(anchor));
-		
-		tbRepo.save(bundle);
-		
-		TrustBundle addedBundle = tbRepo.findById(bundle.getId()).get();
-		assertEquals(1, addedBundle.getTrustBundleAnchors().size());
-		
-		final TrustBundleAnchor newAnchor = new TrustBundleAnchor();
-		newAnchor.setData(loadCertificateData("umesh.der"));
-		newAnchor.setTrustBundle(bundle);
-		
-		bundle.setTrustBundleAnchors(Arrays.asList(newAnchor));
-		tbRepo.save(bundle);
-		
-		addedBundle = tbRepo.findById(bundle.getId()).get();
-		assertEquals(1, addedBundle.getTrustBundleAnchors().size());
-		
-		TrustBundleAnchor addedAnchor = addedBundle.getTrustBundleAnchors().iterator().next();
-		assertEquals(newAnchor.toCertificate(), addedAnchor.toCertificate());
-		
-	}
 }

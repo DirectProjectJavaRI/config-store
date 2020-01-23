@@ -1,12 +1,12 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.SpringBaseTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import reactor.test.StepVerifier;
 
 public abstract class CertPolicyDaoBaseTest extends SpringBaseTest
 {
@@ -18,6 +18,9 @@ public abstract class CertPolicyDaoBaseTest extends SpringBaseTest
 	
 	@Autowired
 	protected CertPolicyGroupRepository groupRepo;
+	
+	@Autowired
+	protected CertPolicyGroupReltnRepository groupReltRepo;
 	
 	@Autowired 
 	protected CertPolicyGroupDomainReltnRepository reltnRepo;
@@ -31,6 +34,8 @@ public abstract class CertPolicyDaoBaseTest extends SpringBaseTest
 	@Before
 	public void setUp()
 	{
+		super.setUp();
+		
 		clearDomains();
 		
 		clearPolicies();
@@ -46,24 +51,43 @@ public abstract class CertPolicyDaoBaseTest extends SpringBaseTest
 	
 	protected void clearPolicies()
 	{
-		groupRepo.deleteAll();
+		groupReltRepo.deleteAll().block();
 		
-		assertTrue(groupRepo.findAll().isEmpty());
+		groupReltRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 		
-		polRepo.deleteAll();
+		groupRepo.deleteAll().block();
 		
-		assertTrue(polRepo.findAll().isEmpty());
+		groupRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
+		
+		polRepo.deleteAll().block();
+		
+		polRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 
 	}
 	
 	protected void clearDomains()
 	{
-		reltnRepo.deleteAll();
+		reltnRepo.deleteAll().block();
 		
-		assertTrue(reltnRepo.findAll().isEmpty());
+		reltnRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 		
-		dmRepo.deleteAll();
+		dmRepo.deleteAll().block();
 		
-		assertTrue(dmRepo.findAll().isEmpty());
+		dmRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 }

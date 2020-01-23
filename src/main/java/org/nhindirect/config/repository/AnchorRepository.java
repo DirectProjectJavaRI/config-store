@@ -24,24 +24,30 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.Anchor;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface AnchorRepository extends JpaRepository<Anchor, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface AnchorRepository extends ReactiveCrudRepository<Anchor, Long>
 {
 	@Transactional
-	public List<Anchor> findByOwnerIgnoreCase(String owner);
+	@Query("select * from anchor a where upper(a.owner) = upper(:owner)")
+	public Flux<Anchor> findByOwnerIgnoreCase(String owner);
 	
 	@Transactional
-	@Query("select a from Anchor a where upper(a.owner) in :owners")
-	public List<Anchor> findByOwnerInIgnoreCase(@Param("owners") List<String> owners);
+	@Query("select * from anchor a where upper(a.owner) in upper(:owners)")
+	public Flux<Anchor> findByOwnerInIgnoreCase(@Param("owners") List<String> owners);
 	
 	@Transactional
-	public void deleteByOwnerIgnoreCase(String owner);
+	@Query("delete from anchor where upper(owner) = upper(:owner)")
+	public Mono<Void> deleteByOwnerIgnoreCase(String owner);
 	
 	@Transactional
-	public void deleteByIdIn(List<Long> ids);
+	@Query("delete from anchor where id in (:ids)")
+	public Mono<Void>  deleteByIdIn(List<Long> ids);
 	
 }

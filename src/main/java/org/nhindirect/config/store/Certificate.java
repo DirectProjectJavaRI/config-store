@@ -28,30 +28,20 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Enumeration;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.nhindirect.common.cert.Thumbprint;
 import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.model.utils.CertUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "certificate",   indexes={@Index(columnList="thumbprint", name="IDX_RI_CERTIFICATE_THUMBPRINT", unique=false)})
 /**
  * The JPA Certificate class
  */
+@Table
 public class Certificate 
 {
 
@@ -65,17 +55,35 @@ public class Certificate
 
     private String owner;
     private String thumbprint;
-    private long id = 0L;
+    
+    @Id
+    private Long id;
+    
+    @Column("certificateData")
     private byte[] data;
-    private Calendar createTime;
-    private Calendar validStartDate;
-    private Calendar validEndDate;
-    private EntityStatus status;
+    
+    @Column("createTime")
+    private LocalDateTime createTime;
+    
+    @Column("validStartDate")
+    private LocalDateTime validStartDate;
+    
+    @Column("validEndDate")
+    private LocalDateTime validEndDate;
+    
+    /*
+     * Map to EntityStatus ordinal
+     * Needed for backward compatibility
+     */
+    private int status;
+    
+    
+    @Column("privateKey")
     private boolean privateKey;
 
     public Certificate()
     {
-    	createTime = Calendar.getInstance();
+    	createTime = LocalDateTime.now();
     }
     
     /**
@@ -83,7 +91,6 @@ public class Certificate
      * 
      * @return the value of owner.
      */
-    @Column(name = "owner")
     public String getOwner() {
         return owner;
     }
@@ -103,8 +110,6 @@ public class Certificate
      * 
      * @return the value of data.
      */
-    @Column(name = "certificateData",  length=8192)
-    @Lob
     public byte[] getData() {
         return data;
     }
@@ -135,7 +140,6 @@ public class Certificate
      * 
      * @return 
      */
-    @Column(name = "privateKey")
     public boolean isPrivateKey() {
         return privateKey;
     }
@@ -161,7 +165,6 @@ public class Certificate
      * 
      * @return the value of thumbprint.
      */
-    @Column(name = "thumbprint")
     public String getThumbprint() {
         return thumbprint;
     }
@@ -171,10 +174,7 @@ public class Certificate
      * 
      * @return the value of id.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -184,7 +184,7 @@ public class Certificate
      * @param id
      *            The value of id.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -193,9 +193,7 @@ public class Certificate
      * 
      * @return the value of createTime.
      */
-    @Column(name = "createTime")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
@@ -205,7 +203,7 @@ public class Certificate
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) {
+    public void setCreateTime(LocalDateTime timestamp) {
         createTime = timestamp;
     }
 
@@ -214,9 +212,7 @@ public class Certificate
      * 
      * @return the value of status.
      */
-    @Column(name = "status")
-    @Enumerated
-    public EntityStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -226,7 +222,7 @@ public class Certificate
      * @param status
      *            The value of status.
      */
-    public void setStatus(EntityStatus status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -235,9 +231,7 @@ public class Certificate
      * 
      * @return the value of validStartDate.
      */
-    @Column(name = "validStartDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getValidStartDate() {
+    public LocalDateTime getValidStartDate() {
         return validStartDate;
     }
 
@@ -247,7 +241,7 @@ public class Certificate
      * @param validStartDate
      *            The value of validStartDate.
      */
-    public void setValidStartDate(Calendar validStartDate) {
+    public void setValidStartDate(LocalDateTime validStartDate) {
         this.validStartDate = validStartDate;
     }
 
@@ -256,9 +250,7 @@ public class Certificate
      * 
      * @return the value of validEndDate.
      */
-    @Column(name = "validEndDate")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getValidEndDate() {
+    public LocalDateTime getValidEndDate() {
         return validEndDate;
     }
 
@@ -268,7 +260,7 @@ public class Certificate
      * @param validEndDate
      *            The value of validEndDate.
      */
-    public void setValidEndDate(Calendar validEndDate) {
+    public void setValidEndDate(LocalDateTime validEndDate) {
         this.validEndDate = validEndDate;
     }
 

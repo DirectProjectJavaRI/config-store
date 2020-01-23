@@ -16,40 +16,38 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package org.nhindirect.config.store;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
-import javax.persistence.Index;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "setting", indexes=@Index(columnList="name", unique=true))
 /**
  * The JPA settings class.  This tables holds various configuration settings such as how the configuration service should behave or settings
  * for a gateway.  This structure is made up of simple name value pairs. 
  */
+@Table
 public class Setting 
 {
     private String name;
     private String value;
-    private long id;
-    private Calendar createTime;
-    private Calendar updateTime;
-    private EntityStatus status = EntityStatus.NEW;
+    
+    @Id
+    private Long id;
+    
+    @Column("createTime")
+    private LocalDateTime createTime;
+    
+    @Column("updateTime")
+    private LocalDateTime updateTime;
+    
+    private int status = EntityStatus.NEW.ordinal();
     
     /**
      * Get the name of the setting.
      * 
      * @return the name of the setting.
      */
-    @Column(name = "name")
     public String getName() {
         return name;
     }
@@ -69,7 +67,6 @@ public class Setting
      * 
      * @return the value of the setting.
      */
-    @Column(name = "value", length=4096)
     public String getValue() {
         return value;
     }
@@ -89,10 +86,7 @@ public class Setting
      * 
      * @return the value of id.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -102,7 +96,7 @@ public class Setting
      * @param id
      *            The value of id.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -111,8 +105,7 @@ public class Setting
      * 
      * @return the value of status.
      */
-    @Enumerated
-    public EntityStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -122,7 +115,7 @@ public class Setting
      * @param status
      *            The value of status.
      */
-    public void setStatus(EntityStatus status) {
+    public void setStatus(int status) {
         this.status = status;
     }
     
@@ -131,8 +124,7 @@ public class Setting
      * 
      * @return the value of createTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
@@ -142,7 +134,7 @@ public class Setting
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) {
+    public void setCreateTime(LocalDateTime timestamp) {
         createTime = timestamp;
     }   
     
@@ -151,8 +143,7 @@ public class Setting
      * 
      * @return the value of updateTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
@@ -162,7 +153,7 @@ public class Setting
      * @param timestamp
      *            The value of updateTime.
      */
-    public void setUpdateTime(Calendar timestamp) {
+    public void setUpdateTime(LocalDateTime timestamp) {
         updateTime = timestamp;
     }     
 }

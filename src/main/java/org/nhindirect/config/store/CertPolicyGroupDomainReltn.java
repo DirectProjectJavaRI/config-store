@@ -1,24 +1,20 @@
 package org.nhindirect.config.store;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "certpolicygroupdomainreltn")
+@Table("certpolicygroupdomainreltn")
 public class CertPolicyGroupDomainReltn 
 {
-	private long id;
+	@Id
+	private Long id;
 	
-	private Domain domain;
+	@Column("domain_id")
+	private Long domainId;
 	
-	private CertPolicyGroup policyGroup;
+	@Column("policy_group_id")
+	private Long policyGroupId;
 	
 	public CertPolicyGroupDomainReltn()
 	{
@@ -30,10 +26,7 @@ public class CertPolicyGroupDomainReltn
      * 
      * @return the value of id.
      */
-    @Column(name = "id", nullable = false)
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() 
+    public Long getId() 
     {
         return id;
     }
@@ -44,7 +37,7 @@ public class CertPolicyGroupDomainReltn
     * @param id
     *            The value of id.
     */
-   public void setId(long id) 
+   public void setId(Long id) 
    {
        this.id = id;
    }   
@@ -54,21 +47,19 @@ public class CertPolicyGroupDomainReltn
     * 
     * @return The value of the policy group.
     */
-   @ManyToOne(optional = false, fetch = FetchType.EAGER)
-   @JoinColumn(name = "policy_group_id")
-   public CertPolicyGroup getCertPolicyGroup() 
+   public Long getCertPolicyGroupId() 
    {
-       return policyGroup;
+       return policyGroupId;
    }
    
    /**
     * Sets the value of the policy group.
     * 
-    * @param policyGroup The value of the policy group.
+    * @param policyGroupId The value of the policy group.
     */
-   public void setCertPolicyGroup(CertPolicyGroup policyGroup)
+   public void setCertPolicyGroupId(Long policyGroupId)
    {
-	   this.policyGroup = policyGroup;
+	   this.policyGroupId = policyGroupId;
    }
    
    
@@ -77,21 +68,18 @@ public class CertPolicyGroupDomainReltn
     * 
     * @return The value of the domain.
     */
-   @ManyToOne(optional = false, fetch = FetchType.EAGER)
-   @JoinColumn(name = "domain_id")
-   public Domain getDomain() 
+   public Long getDomainId() 
    {
-       return domain;
+       return domainId;
    }
    
    /**
     * Sets the value of the domain.
     * 
-    * @param bundle The value of the domain.
+    * @param domainId The value of the domain.
     */
-   public void setDomain(Domain domain)
+   public void setDomainId(Long domainId)
    {
-	   this.domain = domain;
-   }  
-   
+	   this.domainId = domainId;
+   }    
 }

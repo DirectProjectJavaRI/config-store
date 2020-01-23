@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -17,6 +16,8 @@ import org.nhindirect.config.store.Anchor;
 import org.nhindirect.config.store.EntityStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import reactor.test.StepVerifier;
+
 public class AnchorRepositoryTest extends SpringBaseTest
 {
 	
@@ -27,6 +28,14 @@ public class AnchorRepositoryTest extends SpringBaseTest
 	@Autowired
 	private AnchorRepository repo;
 	
+	@Before
+	public void setUp()
+	{
+		super.setUp();
+		
+		repo.deleteAll().block();
+	}
+	
 	private void addTestAnchors() throws Exception
 	{
 		Anchor anchor = new Anchor();
@@ -35,7 +44,10 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		anchor.setOutgoing(true);
 		anchor.setIncoming(true);
 		
-		repo.save(anchor);
+		repo.save(anchor)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 
 		anchor = new Anchor();
 		anchor.setData(loadCertificateData("cacert.der"));
@@ -43,7 +55,10 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		anchor.setOutgoing(true);
 		anchor.setIncoming(true);		
 
-		repo.save(anchor);
+		repo.save(anchor)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 	}
 	
@@ -54,18 +69,13 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		return FileUtils.readFileToByteArray(fl);
 	}
 	
-	@Before
-	public void cleanDataBase()
-	{
-		repo.deleteAll();
-	}
-	
 	@Test
 	public void testCleanDatabase() throws Exception 
 	{
-		final List<Anchor> anchors = repo.findAll();
-		
-		assertEquals(0, anchors.size());
+		repo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 
 	@Test
@@ -75,20 +85,23 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		addTestAnchors();
 		
 		// get all anchors
-		List<Anchor> anchors = repo.findAll();
+		List<Anchor> anchors = repo.findAll().collectList().block();
+		
 		assertNotNull(anchors);
 		assertTrue(anchors.size() > 0);
 		
 		// now delete all by ids
 		for(Anchor anchorToDel : anchors)
-			repo.deleteById(anchorToDel.getId());
+			repo.deleteById(anchorToDel.getId())
+			.as(StepVerifier::create) 
+			.verifyComplete();
+			
 
 		// get all and make sure it is empty
-		anchors = repo.findAll();
-		
-		assertEquals(0, anchors.size());
-		
-		
+		repo.findAll()
+		.as(StepVerifier::create) 
+		.expectNextCount(0) 
+		.verifyComplete();
 	}
 	
 	@Test
@@ -97,7 +110,7 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		addTestAnchors();
 		
 		// validate the anchor was created
-		List<Anchor> anchors = repo.findAll();
+		List<Anchor> anchors = repo.findAll().collectList().block();
 		assertNotNull(anchors);
 		assertEquals(2, anchors.size());
 		
@@ -115,10 +128,7 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		
 		addTestAnchors();
 		
-		List<String> owners = new ArrayList<String>();
-		owners.add(TEST_DOMAIN.toUpperCase());
-		
-		List<Anchor> anchors = repo.findByOwnerInIgnoreCase(owners);
+		List<Anchor> anchors = repo.findByOwnerIgnoreCase(TEST_DOMAIN).collectList().block();
 		assertNotNull(anchors);
 		assertEquals(2, anchors.size());
 		
@@ -133,24 +143,27 @@ public class AnchorRepositoryTest extends SpringBaseTest
 		addTestAnchors();
 
 		// get all domains
-		List<Anchor> anchors = repo.findAll();
+		List<Anchor> anchors = repo.findAll().collectList().block();
 		
 		assertEquals(2, anchors.size());
 		
 		// now update
 		for (Anchor anchor : anchors)
-			anchor.setStatus(EntityStatus.ENABLED);
+			anchor.setStatus(EntityStatus.ENABLED.ordinal());
 
-		repo.saveAll(anchors);
+		repo.saveAll(anchors)
+		.as(StepVerifier::create) 
+		.expectNextCount(2) //
+		.verifyComplete();
 		
 		// get all domains again
-		anchors = repo.findAll();
+		anchors = repo.findAll().collectList().block();
 		
 		assertEquals(2, anchors.size());
 		
 		for (Anchor anchor : anchors)
 		{
-			assertEquals(EntityStatus.ENABLED, anchor.getStatus());
+			assertEquals(EntityStatus.ENABLED.ordinal(), anchor.getStatus());
 			assertEquals(TEST_DOMAIN, anchor.getOwner());
 		}
 	}
@@ -162,25 +175,28 @@ public class AnchorRepositoryTest extends SpringBaseTest
 
 		addTestAnchors();
 		
-		List<Anchor> anchors = repo.findByOwnerIgnoreCase(TEST_DOMAIN.toUpperCase());
+		List<Anchor> anchors = repo.findByOwnerIgnoreCase(TEST_DOMAIN.toUpperCase()).collectList().block();
 		
 		assertEquals(2, anchors.size());
 		
 		// now update
 		for (Anchor anchor : anchors)
-			anchor.setStatus(EntityStatus.ENABLED);
+			anchor.setStatus(EntityStatus.ENABLED.ordinal());
 
-		repo.saveAll(anchors);
+		repo.saveAll(anchors)
+		.as(StepVerifier::create) 
+		.expectNextCount(2) //
+		.verifyComplete();
 		
 		
 		// get all domains again
-		anchors = repo.findAll();
+		anchors = repo.findByOwnerIgnoreCase(TEST_DOMAIN.toUpperCase()).collectList().block();
 		
 		assertEquals(2, anchors.size());
 		
 		for (Anchor anchor : anchors)
 		{
-			assertEquals(EntityStatus.ENABLED, anchor.getStatus());
+			assertEquals(EntityStatus.ENABLED.ordinal(), anchor.getStatus());
 			assertEquals(TEST_DOMAIN, anchor.getOwner());
 		}
 	}

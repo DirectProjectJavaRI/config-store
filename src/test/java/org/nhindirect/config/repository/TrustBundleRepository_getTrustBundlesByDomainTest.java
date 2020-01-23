@@ -10,6 +10,8 @@ import org.nhindirect.config.store.Domain;
 import org.nhindirect.config.store.TrustBundle;
 import org.nhindirect.config.store.TrustBundleDomainReltn;
 
+import reactor.test.StepVerifier;
+
 public class TrustBundleRepository_getTrustBundlesByDomainTest extends TrustBundleDaoBaseTest
 {
 	@Test
@@ -17,23 +19,32 @@ public class TrustBundleRepository_getTrustBundlesByDomainTest extends TrustBund
 	{
 		Domain domain = new Domain();
 		domain.setDomainName("Test Domain");
-		domain = dmRepo.save(domain);
+		dmRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundle bundle = new TrustBundle();
 		bundle.setBundleName("Test Bundle");
 		bundle.setBundleURL("http://test/url/bundle");
 		bundle.setCheckSum("1234");
-		bundle = tbRepo.save(bundle);
+		tbRepo.save(bundle)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundleDomainReltn reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain);
-		reltn.setTrustBundle(bundle);
+		reltn.setDomainId(domain.getId());
+		reltn.setTrustBundleId(bundle.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomain(domain);
+		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(1, bundles.size());
 	}
 	
@@ -42,44 +53,59 @@ public class TrustBundleRepository_getTrustBundlesByDomainTest extends TrustBund
 	{
 		Domain domain = new Domain();
 		domain.setDomainName("Test Domain");
-		domain = dmRepo.save(domain);
+		dmRepo.save(domain)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundle bundle1 = new TrustBundle();
 		bundle1.setBundleName("Test Bundle");
 		bundle1.setBundleURL("http://test/url/bundle");
 		bundle1.setCheckSum("1234");
-		bundle1 = tbRepo.save(bundle1);
+		tbRepo.save(bundle1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 	
 		
 		TrustBundle bundle2 = new TrustBundle();
 		bundle2.setBundleName("Test Bundle2");
 		bundle2.setBundleURL("http://test/url/bundle2");
 		bundle2.setCheckSum("1234");
-		bundle2 = tbRepo.save(bundle2);
+		tbRepo.save(bundle2)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundleDomainReltn reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain);
-		reltn.setTrustBundle(bundle1);
+		reltn.setDomainId(domain.getId());
+		reltn.setTrustBundleId(bundle1.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		
 		reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain);
-		reltn.setTrustBundle(bundle2);
+		reltn.setDomainId(domain.getId());
+		reltn.setTrustBundleId(bundle2.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		final Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomain(domain);
+		final Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(2, bundles.size());
 		
 		Iterator<TrustBundleDomainReltn> bundleIter = bundles.iterator();
-		assertEquals(bundle1.getBundleName(), bundleIter.next().getTrustBundle().getBundleName());
-		assertEquals(bundle2.getBundleName(), bundleIter.next().getTrustBundle().getBundleName());
+		assertEquals(bundle1.getId(), bundleIter.next().getTrustBundleId());
+		assertEquals(bundle2.getId(), bundleIter.next().getTrustBundleId());
 	}	
 	
 	
@@ -88,52 +114,70 @@ public class TrustBundleRepository_getTrustBundlesByDomainTest extends TrustBund
 	{
 		Domain domain1 = new Domain();
 		domain1.setDomainName("Test Domain");
-		domain1 = dmRepo.save(domain1);
+		dmRepo.save(domain1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		Domain domain2 = new Domain();
 		domain2.setDomainName("Test Domain 2");
-		domain2 = dmRepo.save(domain2);
+		dmRepo.save(domain2)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundle bundle1 = new TrustBundle();
 		bundle1.setBundleName("Test Bundle");
 		bundle1.setBundleURL("http://test/url/bundle");
 		bundle1.setCheckSum("1234");
-		bundle1 = tbRepo.save(bundle1);
+		tbRepo.save(bundle1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundle bundle2 = new TrustBundle();
 		bundle2.setBundleName("Test Bundle2");
 		bundle2.setBundleURL("http://test/url/bundle2");
 		bundle2.setCheckSum("1234");
-		bundle2 = tbRepo.save(bundle2);
+		tbRepo.save(bundle2)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundleDomainReltn reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain1);
-		reltn.setTrustBundle(bundle1);
+		reltn.setDomainId(domain1.getId());
+		reltn.setTrustBundleId(bundle1.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		
 		reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain2);
-		reltn.setTrustBundle(bundle2);
+		reltn.setDomainId(domain2.getId());
+		reltn.setTrustBundleId(bundle2.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomain(domain1);
+		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomainId(domain1.getId()).collectList().block();
 		assertEquals(1, bundles.size());
 		
 		Iterator<TrustBundleDomainReltn> bundleIter = bundles.iterator();
-		assertEquals(bundle1.getBundleName(), bundleIter.next().getTrustBundle().getBundleName());
+		assertEquals(bundle1.getId(), bundleIter.next().getTrustBundleId());
 		
-		bundles = reltnRepo.findByDomain(domain2);
+		bundles = reltnRepo.findByDomainId(domain2.getId()).collectList().block();
 		assertEquals(1, bundles.size());
 		
 		bundleIter = bundles.iterator();
-		assertEquals(bundle2.getBundleName(), bundleIter.next().getTrustBundle().getBundleName());
+		assertEquals(bundle2.getId(), bundleIter.next().getTrustBundleId());
 
 	}	
 	
@@ -143,45 +187,60 @@ public class TrustBundleRepository_getTrustBundlesByDomainTest extends TrustBund
 	{
 		Domain domain1 = new Domain();
 		domain1.setDomainName("Test Domain 1");
-		domain1 = dmRepo.save(domain1);
+		dmRepo.save(domain1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		Domain domain2 = new Domain();
 		domain2.setDomainName("Test Domain 2");
-		domain2 = dmRepo.save(domain2);
+		dmRepo.save(domain2)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundle bundle1 = new TrustBundle();
 		bundle1.setBundleName("Test Bundle1");
 		bundle1.setBundleURL("http://test/url/bundle1");
 		bundle1.setCheckSum("1234");
-		bundle1 = tbRepo.save(bundle1);
+		tbRepo.save(bundle1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		TrustBundleDomainReltn reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain1);
-		reltn.setTrustBundle(bundle1);
+		reltn.setDomainId(domain1.getId());
+		reltn.setTrustBundleId(bundle1.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		reltn = new TrustBundleDomainReltn();
-		reltn.setDomain(domain2);
-		reltn.setTrustBundle(bundle1);
+		reltn.setDomainId(domain2.getId());
+		reltn.setTrustBundleId(bundle1.getId());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(true);
 		
-		reltnRepo.save(reltn);
+		reltnRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomain(domain1);
+		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomainId(domain1.getId()).collectList().block();
 		assertEquals(1, bundles.size());
 		
 		Iterator<TrustBundleDomainReltn> bundleIter = bundles.iterator();
-		assertEquals(bundle1.getBundleName(), bundleIter.next().getTrustBundle().getBundleName());
+		assertEquals(bundle1.getId(), bundleIter.next().getTrustBundleId());
 		
-		bundles = reltnRepo.findByDomain(domain2);
+		bundles = reltnRepo.findByDomainId(domain2.getId()).collectList().block();
 		assertEquals(1, bundles.size());
 		
 		bundleIter = bundles.iterator();
-		assertEquals(bundle1.getBundleName(), bundleIter.next().getTrustBundle().getBundleName());
+		assertEquals(bundle1.getId(), bundleIter.next().getTrustBundleId());
 
 	}
 	
@@ -190,9 +249,12 @@ public class TrustBundleRepository_getTrustBundlesByDomainTest extends TrustBund
 	{
 		Domain domain1 = new Domain();
 		domain1.setDomainName("Test Domain 1");
-		domain1 = dmRepo.save(domain1);
+		dmRepo.save(domain1)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomain(domain1);
+		Collection<TrustBundleDomainReltn> bundles = reltnRepo.findByDomainId(domain1.getId()).collectList().block();
 		assertEquals(0, bundles.size());
 	}	
 }

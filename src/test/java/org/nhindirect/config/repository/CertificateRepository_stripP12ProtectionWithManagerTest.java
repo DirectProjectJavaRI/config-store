@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.Collection;
-
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -16,6 +14,8 @@ import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.model.utils.CertUtils;
 import org.nhindirect.config.store.Certificate;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import reactor.test.StepVerifier;
 
 public class CertificateRepository_stripP12ProtectionWithManagerTest extends SpringBaseTest
 {
@@ -32,7 +32,7 @@ public class CertificateRepository_stripP12ProtectionWithManagerTest extends Spr
 	@Before
 	public void cleanDataBase()
 	{
-		repo.deleteAll();
+		repo.deleteAll().block();
 	}    	
 	
 	private static byte[] loadCertificateData(String certFileName) throws Exception
@@ -53,7 +53,10 @@ public class CertificateRepository_stripP12ProtectionWithManagerTest extends Spr
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		return cert;
 	}
@@ -64,10 +67,7 @@ public class CertificateRepository_stripP12ProtectionWithManagerTest extends Spr
 		populateCert("gm2552.der", "gm2552Key.der");
 		
     	
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
-		
-		Certificate cert = certificates.iterator().next();
+		Certificate cert = repo.findAll().blockFirst();
 		
 		assertTrue(cert.isPrivateKey());
 		final byte[] certData = CertificateRepositoryTest.loadPkcs12FromCertAndKey("gm2552.der", "gm2552Key.der");
@@ -83,10 +83,7 @@ public class CertificateRepository_stripP12ProtectionWithManagerTest extends Spr
 	{
 		populateCert("gm2552.der", null);
 				
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
-		
-		Certificate cert = certificates.iterator().next();
+		Certificate cert = repo.findAll().blockFirst();
 		
 		assertFalse(cert.isPrivateKey());
 		final byte[] certData = loadCertificateData("gm2552.der");

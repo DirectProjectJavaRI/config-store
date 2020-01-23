@@ -1,35 +1,31 @@
 package org.nhindirect.config.store;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.xml.bind.annotation.XmlAttribute;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import org.nhindirect.policy.PolicyLexicon;
-
-@Entity
-@Table(name = "certpolicy", indexes=@Index(columnList="policyName", unique=true))
+@Table("certpolicy")
 public class CertPolicy 
 {
-	private long id;
+	@Id
+	private Long id;
+	
+	@Column("policyName")
 	private String policyName;
-	private PolicyLexicon lexicon;
+	
+	private int lexicon;
+	
+	@Column("data")
 	private byte[] policyData;
-    private Calendar createTime;  	
+	
+	@Column("createTime")
+    private LocalDateTime createTime;  	
 	
 	public CertPolicy()
 	{
-		createTime = Calendar.getInstance();
+		createTime = LocalDateTime.now();
 	}
 	
     /**
@@ -37,10 +33,7 @@ public class CertPolicy
      * 
      * @return the value of id.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() 
+    public Long getId() 
     {
         return id;
     }
@@ -51,20 +44,17 @@ public class CertPolicy
      * @param id
      *            The value of id.
      */
-    public void setId(long id) 
+    public void setId(Long id) 
     {
         this.id = id;
     } 
     
-    @Enumerated
-    @Column(name = "lexicon", nullable = false)
-    @XmlAttribute
-    public PolicyLexicon getLexicon()
+    public int getLexicon()
     {
     	return lexicon;
     }
     
-    public void setLexicon(PolicyLexicon lexicon)
+    public void setLexicon(int lexicon)
     {
     	this.lexicon = lexicon;
     }
@@ -74,7 +64,6 @@ public class CertPolicy
      * 
      * @return the value of policyName.
      */
-    @Column(name = "policyName", unique = true)
     public String getPolicyName() 
     {
         return policyName;
@@ -90,8 +79,6 @@ public class CertPolicy
     	this.policyName = policyName;
     }
     
-    @Column(name = "data", nullable = false, length=204800)
-    @Lob
     public byte[] getPolicyData()
     {
     	return policyData;
@@ -107,9 +94,7 @@ public class CertPolicy
      * 
      * @return the value of createTime.
      */
-    @Column(name = "createTime", nullable = false)    
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() 
+    public LocalDateTime getCreateTime() 
     {
         return createTime;
     }
@@ -120,7 +105,7 @@ public class CertPolicy
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) 
+    public void setCreateTime(LocalDateTime timestamp) 
     {
         createTime = timestamp;
     }       

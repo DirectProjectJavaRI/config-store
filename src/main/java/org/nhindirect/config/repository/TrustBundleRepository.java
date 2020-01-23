@@ -23,13 +23,17 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package org.nhindirect.config.repository;
 
 
-import javax.transaction.Transactional;
 
 import org.nhindirect.config.store.TrustBundle;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface TrustBundleRepository extends JpaRepository<TrustBundle, Long>
+import reactor.core.publisher.Mono;
+
+public interface TrustBundleRepository extends ReactiveCrudRepository<TrustBundle, Long>
 {
 	@Transactional
-	public TrustBundle findByBundleNameIgnoreCase(String bundleName);
+	@Query("select * from trustbundle b where upper(b.bundleName) = upper(:bundleName)")
+	public Mono<TrustBundle> findByBundleNameIgnoreCase(String bundleName);
 }

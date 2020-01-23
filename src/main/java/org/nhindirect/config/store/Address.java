@@ -21,46 +21,39 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.config.store;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "address")
 /**
  * The JPA Address class
  */
+@Table
 public class Address {
 
+	@Column("emailAddress")
     private String emailAddress;
 
+    @Id
     private Long id;
 
-    private Domain domain;
+    @Column("domainId")
+    private Long domainId;
 
+    @Column("displayName")
     private String displayName;
     
     private String endpoint;
 
-    private Calendar createTime;
+    @Column("createTime")
+    private LocalDateTime createTime;
 
-    private Calendar updateTime;
+    @Column("createTime")
+    private LocalDateTime updateTime;
 
-    private EntityStatus status;
+    private int status;
 
     private String type;
 
@@ -69,7 +62,7 @@ public class Address {
      */
     public Address() 
     {
-    	createTime = Calendar.getInstance();
+    	createTime = LocalDateTime.now();
     }
 
     /**
@@ -80,13 +73,13 @@ public class Address {
      * @param anAddress
      *            The address.
      */
-    public Address(Domain aDomain, String anAddress) {
-        setDomain(aDomain);
+    public Address(Long domainId, String anAddress) {
+        setDomainId(domainId);
         setEmailAddress(anAddress);
         setDisplayName("");
-        setCreateTime(Calendar.getInstance());
-        setUpdateTime(Calendar.getInstance());
-        setStatus(EntityStatus.NEW);
+        setCreateTime(LocalDateTime.now());
+        setUpdateTime(LocalDateTime.now());
+        setStatus(EntityStatus.NEW.ordinal());
     }
 
     /**
@@ -99,13 +92,13 @@ public class Address {
      * @param aName
      *            The display name.
      */
-    public Address(Domain aDomain, String anAddress, String aName) {
-        setDomain(aDomain);
+    public Address(Long domainId, String anAddress, String aName) {
+        setDomainId(domainId);
         setEmailAddress(anAddress);
         setDisplayName(aName);
-        setCreateTime(Calendar.getInstance());
-        setUpdateTime(Calendar.getInstance());
-        setStatus(EntityStatus.NEW);
+        setCreateTime(LocalDateTime.now());
+        setUpdateTime(LocalDateTime.now());
+        setStatus(EntityStatus.NEW.ordinal());
     }
 
     /**
@@ -116,7 +109,7 @@ public class Address {
      */
     public Address(Address anAddress) {
         if (anAddress != null) {
-            setDomain(anAddress.getDomain());
+            setDomainId(anAddress.getDomainId());
             setEmailAddress(anAddress.getEmailAddress());
             setDisplayName(anAddress.getDisplayName());
             setEndpoint(anAddress.getEndpoint());
@@ -132,7 +125,6 @@ public class Address {
      * 
      * @return the value of emailAddress.
      */
-    @Column(name = "emailaddress", length = 400)
     public String getEmailAddress() {
         return emailAddress;
     }
@@ -152,10 +144,6 @@ public class Address {
      * 
      * @return the value of id.
      */
-    @Column(name = "id", nullable = false)
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @XmlAttribute
     public Long getId() {
         if (id == null) {
             setId(new Long(0L));
@@ -174,15 +162,12 @@ public class Address {
     }
 
     /**
-     * Get the value of domain.
+     * Get the value of domain id.
      * 
-     * @return the value of domain.
+     * @return the value of domain id.
      */
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "domainId")
-    @XmlTransient
-    public Domain getDomain() {
-        return domain;
+    public Long getDomainId() {
+        return this.domainId;
     }
 
     /**
@@ -191,8 +176,8 @@ public class Address {
      * @param anId
      *            The value of domain.
      */
-    public void setDomain(Domain anId) {
-        domain = anId;
+    public void setDomainId(Long domainId) {
+    	this.domainId = domainId;
 
     }
 
@@ -201,7 +186,6 @@ public class Address {
      * 
      * @return the value of displayName.
      */
-    @Column(name = "displayname", length = 100)
     public String getDisplayName() {
         return displayName;
     }
@@ -221,7 +205,6 @@ public class Address {
      * 
      * @return the value of entpoint.
      */
-    @Column(name = "endpoint", length = 255)
     public String getEndpoint() {
         return endpoint;
     }
@@ -241,8 +224,7 @@ public class Address {
      * 
      * @return the value of createTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
@@ -252,7 +234,7 @@ public class Address {
      * @param timestamp
      *            The value of createTime.
      */
-    public void setCreateTime(Calendar timestamp) {
+    public void setCreateTime(LocalDateTime timestamp) {
         createTime = timestamp;
     }
 
@@ -261,8 +243,7 @@ public class Address {
      * 
      * @return the value of updateTime.
      */
-    @Temporal(TemporalType.TIMESTAMP)
-    public Calendar getUpdateTime() {
+    public LocalDateTime getUpdateTime() {
         return updateTime;
     }
 
@@ -272,7 +253,7 @@ public class Address {
      * @param timestamp
      *            The value of updateTime.
      */
-    public void setUpdateTime(Calendar timestamp) {
+    public void setUpdateTime(LocalDateTime timestamp) {
         updateTime = timestamp;
     }
 
@@ -281,9 +262,7 @@ public class Address {
      * 
      * @return the value of status.
      */
-    @Column(name = "status")
-    @Enumerated
-    public EntityStatus getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -293,7 +272,7 @@ public class Address {
      * @param aStatus
      *            The value of status.
      */
-    public void setStatus(EntityStatus aStatus) {
+    public void setStatus(int aStatus) {
         status = aStatus;
     }
 
@@ -302,7 +281,6 @@ public class Address {
      * 
      * @return the value of type.
      */
-    @Column(name = "type", length = 64)
     public String getType() {
         return type;
     }
@@ -327,23 +305,12 @@ public class Address {
         return "[ID: " + getId() + 
                " | Address: " + getEmailAddress() + 
                " | For: " + getDisplayName() + 
-               " | Domain: " + ((getDomain() != null) ? getDomain().getDomainName() : "empty") + 
+               " | Domain Id: " + ((getDomainId() != null) ? getDomainId() : "empty") + 
                " | Endpoint: " + getEndpoint() +
-               " | Status: " + getStatus() +
+               " | Status: " + EntityStatus.values()[getStatus()] +
                " | Type: " + getType() + 
                "]";
     }
 
-    /**
-     * Actions to run after an unmarshal.
-     * 
-     * @param u
-     *            The Unmarshaller.
-     * @param parent
-     *            The paret.
-     */
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        setDomain((Domain) parent);
-    }
 
 }

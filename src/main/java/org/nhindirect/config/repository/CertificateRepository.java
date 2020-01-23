@@ -21,26 +21,36 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.config.repository;
 
+
 import java.util.List;
 
 import org.nhindirect.config.store.Certificate;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface CertificateRepository extends JpaRepository<Certificate, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface CertificateRepository extends ReactiveCrudRepository<Certificate, Long>
 {
 	@Transactional
-	public List<Certificate> findByOwnerIgnoreCase(String owner);
+	@Query("select * from certificate c where upper(c.owner) = upper(:owner)")
+	public Flux<Certificate> findByOwnerIgnoreCase(String owner);
 	
 	@Transactional
-	public Certificate findByOwnerIgnoreCaseAndThumbprint(String owner, String tp);
+	@Query("select * from certificate c where upper(c.owner) = upper(:owner) and c.thumbprint = :tp")
+	public Mono<Certificate> findByOwnerIgnoreCaseAndThumbprint(String owner, String tp);
 	
 	@Transactional
-	public List<Certificate> findByThumbprint(String tb);
+	@Query("select * from certificate c where c.thumbprint = :tp")
+	public Flux<Certificate> findByThumbprint(String tb);
 	
 	@Transactional
-	public void deleteByOwnerIgnoreCase(String owner);
+	@Query("delete from certificate where upper(owner) = upper(:owner)")
+	public Mono<Void> deleteByOwnerIgnoreCase(String owner);
 	
 	@Transactional
-	public void deleteByIdIn(List<Long> ids);
+	@Query("delete from certificate where id in (:ids)")
+	public Mono<Void> deleteByIdIn(List<Long> ids);
 }

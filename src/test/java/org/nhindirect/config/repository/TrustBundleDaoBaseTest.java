@@ -1,10 +1,6 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertTrue;
-
-
 import java.io.File;
-
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -14,10 +10,15 @@ import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.repository.TrustBundleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import reactor.test.StepVerifier;
+
 public abstract class TrustBundleDaoBaseTest extends SpringBaseTest
 {
 	@Autowired
 	protected TrustBundleRepository tbRepo;	
+	
+	@Autowired
+	protected TrustBundleAnchorRepository tbAncRepo;	
 	
 	@Autowired
 	protected DomainRepository dmRepo;		
@@ -42,6 +43,8 @@ public abstract class TrustBundleDaoBaseTest extends SpringBaseTest
 	@Before
 	public void setUp()
 	{
+		super.setUp();
+		
 		clearRetlns();
 		
 		clearBundles();
@@ -61,24 +64,40 @@ public abstract class TrustBundleDaoBaseTest extends SpringBaseTest
 	
 	protected void clearRetlns()
 	{
-		reltnRepo.deleteAll();
+		reltnRepo.deleteAll().block();
 		
-		assertTrue(reltnRepo.findAll().isEmpty());
+		reltnRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 	
 	protected void clearBundles()
 	{
-		tbRepo.deleteAll();
+		tbAncRepo.deleteAll().block();
 		
-		assertTrue(tbRepo.findAll().isEmpty());
+		tbAncRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
+		
+		tbRepo.deleteAll().block();
+		
+		tbRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 	
 	
 	protected void clearDomains()
 	{
-		dmRepo.deleteAll();
+		dmRepo.deleteAll().block();
 		
-		assertTrue(dmRepo.findAll().isEmpty());
+		dmRepo.findAll()
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
 	}
 	
 }

@@ -4,18 +4,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Calendar;
-import java.util.Locale;
+import java.time.LocalDateTime;
 
 import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
+
+import reactor.test.StepVerifier;
 
 public class CertPolicyGroupRepository_getPolicyGroupByNameTest extends CertPolicyDaoBaseTest
 {
 	@Test
 	public void testGetPolicyGroupByName_emptyStore_assertNoPolicyReturned()
 	{
-		assertNull(groupRepo.findByPolicyGroupNameIgnoreCase("Test Group"));
+		groupRepo.findByPolicyGroupNameIgnoreCase("Test Group")
+		.as(StepVerifier::create)
+		.expectNextCount(0)
+		.verifyComplete();
+
 	}
 	
 	@Test
@@ -24,25 +29,30 @@ public class CertPolicyGroupRepository_getPolicyGroupByNameTest extends CertPoli
 		final CertPolicyGroup group = new CertPolicyGroup();
 		group.setPolicyGroupName("Test Group");
 
-		groupRepo.save(group);
+		groupRepo.save(group)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		
-		assertNull(groupRepo.findByPolicyGroupNameIgnoreCase("Test Group X"));
+		assertNull(groupRepo.findByPolicyGroupNameIgnoreCase("Test Group X").block());
 	}
 	
 	@Test
 	public void testGetPolicyGroupByName_singlePolicyGroupInStore_assertPolicyGroupReturned()
 	{
-		final Calendar now = Calendar.getInstance(Locale.getDefault());
+		final LocalDateTime now = LocalDateTime.now();
 		
 		final CertPolicyGroup group = new CertPolicyGroup();
 		group.setPolicyGroupName("Test Group");
 
-		groupRepo.save(group);
+		groupRepo.save(group)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		CertPolicyGroup addedGroup = groupRepo.findByPolicyGroupNameIgnoreCase("Test GrouP");
+		CertPolicyGroup addedGroup = groupRepo.findByPolicyGroupNameIgnoreCase("Test GrouP").block();
 		
 		assertEquals(group.getPolicyGroupName(), addedGroup.getPolicyGroupName());	
-		assertTrue(now.getTimeInMillis() <= addedGroup.getCreateTime().getTimeInMillis());
+		assertTrue(now.compareTo(addedGroup.getCreateTime()) <= 0);
 	}	
 }

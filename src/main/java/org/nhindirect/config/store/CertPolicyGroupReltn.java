@@ -1,27 +1,26 @@
 package org.nhindirect.config.store;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "certpolicygroupreltn")
+@Table("certpolicygroupreltn")
 public class CertPolicyGroupReltn 
 {
-	private long id;
-	private CertPolicyGroup policyGroup;
-	private CertPolicy policy;
-	private CertPolicyUse policyUse;
+	@Id
+	private Long id;
+	
+	@Column("certPolicyGroupId")
+	private Long policyGroupId;
+	
+	@Column("certPolicyId")
+	private Long policyId;
+	
+	@Column("policyUse")
+	private int policyUse;
+	
 	private boolean incoming;
+	
 	private boolean outgoing;
 
 	public CertPolicyGroupReltn()
@@ -34,10 +33,7 @@ public class CertPolicyGroupReltn
      * 
      * @return the value of id.
      */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() 
+    public Long getId() 
     {
         return id;
     }
@@ -48,52 +44,41 @@ public class CertPolicyGroupReltn
      * @param id
      *            The value of id.
      */
-    public void setId(long id) 
+    public void setId(Long id) 
     {
         this.id = id;
     } 
     
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "certPolicyGroupId")
-    @XmlTransient 
-    public  CertPolicyGroup getCertPolicyGroup()
+    public Long getCertPolicyGroupId()
     {
-    	return policyGroup;
+    	return policyGroupId;
     }
     
-    public void setCertPolicyGroup( CertPolicyGroup policyGroup)
+    public void setCertPolicyGroupId(Long policyGroupId)
     {
-    	this.policyGroup = policyGroup;
+    	this.policyGroupId = policyGroupId;
     }
     
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "certPolicyId")
-    public CertPolicy getCertPolicy()
+    public Long getCertPolicyId()
     {
-    	return policy;
+    	return policyId;
     }  
     
-    public void setCertPolicy(CertPolicy policy)
+    public void setCertPolicyId(Long policyId)
     {
-    	this.policy = policy;
+    	this.policyId = policyId;
     } 
     
-    
-    @Column(name = "policyUse", nullable=false)
-    @Enumerated
-    @XmlAttribute
-    public CertPolicyUse getPolicyUse()
+    public int getPolicyUse()
     {
     	return policyUse;
     }
 
-    public void setPolicyUse(CertPolicyUse policyUse)
+    public void setPolicyUse(int policyUse)
     {
     	this.policyUse = policyUse;
     }
     
-
-    @Column(name = "incoming")
     public boolean isIncoming() 
     {
         return incoming;
@@ -106,12 +91,10 @@ public class CertPolicyGroupReltn
     }
 
 
-    @Column(name = "outgoing")
     public boolean isOutgoing() 
     {
         return outgoing;
     }
-
 
     public void setOutgoing(boolean outgoing) 
     {

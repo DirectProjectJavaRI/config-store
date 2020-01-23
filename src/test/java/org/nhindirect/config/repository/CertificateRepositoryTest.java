@@ -12,7 +12,6 @@ import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -22,6 +21,8 @@ import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.store.Certificate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import reactor.test.StepVerifier;
 
 @Transactional
 public class CertificateRepositoryTest extends SpringBaseTest
@@ -39,7 +40,7 @@ public class CertificateRepositoryTest extends SpringBaseTest
 	@Before
 	public void cleanDataBase()
 	{
-		repo.deleteAll();
+		repo.deleteAll().block();
 	}     	
 	
 	private static byte[] loadCertificateData(String certFileName) throws Exception
@@ -92,7 +93,11 @@ public class CertificateRepositoryTest extends SpringBaseTest
 	public void testCleanDatabase() throws Exception 
 	{
 
-		assertEquals(0, repo.findAll().size());
+		repo.findAll()
+			.as(StepVerifier::create)
+			.expectNextCount(0)
+			.verifyComplete();
+		
 	}
 	
 	@Test 
@@ -105,10 +110,18 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
-				
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
+		
+		repo.findAll()
+		.as(StepVerifier::create)
+		.assertNext(s -> {
+			s.getOwner().equals("gm2552@cerner.com");
+		})
+		.verifyComplete();
+		
 	}
 	
 	@Test 
@@ -120,16 +133,15 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData("http://localhost/test.der".getBytes());
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
-				
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
-		Certificate addedCert = certificates.iterator().next();
-		
+		Certificate addedCert = repo.findAll().blockFirst();
+
 		assertEquals("", addedCert.getThumbprint());
 		assertEquals("http://localhost/test.der", new String(addedCert.getData()));
-		
 	}
 	
 	@Test 
@@ -143,10 +155,17 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 				
-		Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
+		repo.findAll()
+		.as(StepVerifier::create)
+		.assertNext(s -> {
+			s.getOwner().equals("gm2552@cerner.com");
+		})
+		.verifyComplete();
 	}	
 	
 	@Test 
@@ -160,16 +179,22 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 				
-		Collection<Certificate> certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.com");
-		assertEquals(1, certificates.size());
-		cert = certificates.iterator().next();
+		repo.findByOwnerIgnoreCase("gm2552@cerner.com")
+		.as(StepVerifier::create)
+		.assertNext(s -> {
+				s.getOwner().equals("gm2552@cerner.com");
+		})
+		.verifyComplete();
 		
-		assertEquals("gm2552@cerner.com", cert.getOwner());
 		
-		
-		repo.deleteAll();
+		repo.deleteAll()
+		.as(StepVerifier::create) 
+		.verifyComplete();
 		
 		certData = loadCertificateData("gm2552.der");
 		
@@ -177,13 +202,17 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)		
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 				
-		certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.com");
-		assertEquals(1, certificates.size());
-		cert = certificates.iterator().next();
-		
-		assertEquals("gm2552@cerner.com", cert.getOwner());
+		repo.findByOwnerIgnoreCase("gm2552@cerner.com")
+		.as(StepVerifier::create)
+		.assertNext(s -> {
+				s.getOwner().equals("gm2552@cerner.com");
+		})
+		.verifyComplete();
 	}	
 	
 	@Test 
@@ -197,17 +226,20 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 				
-		Collection<Certificate> certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.com");
-		assertEquals(1, certificates.size());
-		cert = certificates.iterator().next();
-		certificates = repo.findAllById(Arrays.asList(cert.getId()));
+		cert = repo.findAll().blockFirst();
 		
-		assertEquals(1, certificates.size());
-		cert = certificates.iterator().next();
-		
-		assertEquals("gm2552@cerner.com", cert.getOwner());
+
+		repo.findAllById(Arrays.asList(cert.getId()))
+		.as(StepVerifier::create)
+		.assertNext(s -> {
+			s.getOwner().equals("gm2552@cerner.com");
+		})
+		.verifyComplete();
 		
 	}		
 	
@@ -222,16 +254,22 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 				
-		Collection<Certificate> certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.COM");
-		assertEquals(1, certificates.size());
-		cert = certificates.iterator().next();		
+		cert = repo.findByOwnerIgnoreCase("gm2552@cerner.com").blockFirst();		
 		assertEquals("gm2552@cerner.com", cert.getOwner());
 		
-		repo.deleteByOwnerIgnoreCase("gm2552@cerner.com");
-		certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.com");
-		assertEquals(0, certificates.size());
+		repo.deleteByOwnerIgnoreCase("gm2552@cerner.com")
+		.as(StepVerifier::create) 
+		.verifyComplete();
+		
+		repo.findByOwnerIgnoreCase("gm2552@cerner.com")	
+		.as(StepVerifier::create) 
+		.expectNextCount(0) 
+		.verifyComplete();
 	}		
 	
 	@Test 
@@ -245,15 +283,21 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		cert.setData(certData);
 		cert.setOwner("gm2552@cerner.com");
 		
-		repo.save(cert);
+		repo.save(cert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 				
-		Collection<Certificate> certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.com");
-		assertEquals(1, certificates.size());
-		cert = certificates.iterator().next();		
+		cert = repo.findByOwnerIgnoreCase("gm2552@cerner.com").blockFirst();		
 		assertEquals("gm2552@cerner.com", cert.getOwner());
 		
-		repo.deleteById(cert.getId());
-		certificates = repo.findByOwnerIgnoreCase("gm2552@cerner.com");
-		assertEquals(0, certificates.size());
+		repo.deleteById(cert.getId())
+		.as(StepVerifier::create) 
+		.verifyComplete();
+		
+		repo.findByOwnerIgnoreCase("gm2552@cerner.com")	
+		.as(StepVerifier::create) 
+		.expectNextCount(0) 
+		.verifyComplete();
 	}		
 }

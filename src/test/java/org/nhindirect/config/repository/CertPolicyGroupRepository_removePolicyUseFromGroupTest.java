@@ -2,7 +2,7 @@ package org.nhindirect.config.repository;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
@@ -11,45 +11,51 @@ import org.nhindirect.config.store.CertPolicyGroupReltn;
 import org.nhindirect.config.store.CertPolicyUse;
 import org.nhindirect.policy.PolicyLexicon;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import reactor.test.StepVerifier;
 
 public class CertPolicyGroupRepository_removePolicyUseFromGroupTest extends CertPolicyDaoBaseTest
 {
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testRemovePolicyFromGroup_addedPolicyToGroup_assertAssociationRemoved()
 	{
 		final CertPolicyGroup group = new CertPolicyGroup();
 		group.setPolicyGroupName("Test Group");
-		groupRepo.save(group);
+		groupRepo.save(group)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		final CertPolicy policy = new CertPolicy();
 		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML);
+		policy.setLexicon(PolicyLexicon.XML.ordinal());
 		policy.setPolicyData(new byte[] {1,2,3});
 		
-		polRepo.save(policy);
+		polRepo.save(policy)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 		CertPolicyGroupReltn reltn = new CertPolicyGroupReltn();
-		reltn.setCertPolicy(policy);
-		reltn.setCertPolicyGroup(group);
-		reltn.setPolicyUse(CertPolicyUse.PUBLIC_RESOLVER);
+		reltn.setCertPolicyId(policy.getId());
+		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setPolicyUse(CertPolicyUse.PUBLIC_RESOLVER.ordinal());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(false);
 		
-		group.setCertPolicyGroupReltn(Arrays.asList(reltn));
 		
-		groupRepo.save(group);
+		groupReltRepo.save(reltn)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 		
 			
-		CertPolicyGroup assocGroup = groupRepo.findById(group.getId()).get();
-		assertEquals(1, assocGroup.getCertPolicyGroupReltn().size());
+		List<CertPolicyGroupReltn> assocGroups = groupReltRepo.findByGroupId(group.getId()).collectList().block();
+		assertEquals(1, assocGroups.size());
 		
-		group.setCertPolicyGroupReltn(Collections.emptyList());
-		groupRepo.save(group);
+		groupReltRepo.deleteByGroupId(group.getId()).block();
 		
-		assocGroup = groupRepo.findById(group.getId()).get();
-		assertEquals(0, assocGroup.getCertPolicyGroupReltn().size());		
+		assocGroups = groupReltRepo.findByGroupId(group.getId()).collectList().block();
+		assertEquals(0, assocGroups.size());		
 		
 	}
 }

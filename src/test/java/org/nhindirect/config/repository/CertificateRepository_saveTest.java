@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -14,6 +13,8 @@ import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.model.utils.CertUtils;
 import org.nhindirect.config.store.Certificate;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import reactor.test.StepVerifier;
 
 public class CertificateRepository_saveTest extends SpringBaseTest
 {	
@@ -42,13 +43,13 @@ public class CertificateRepository_saveTest extends SpringBaseTest
 		addCert.setData(CertUtils.certAndWrappedKeyToRawByteFormat(keyData, CertUtils.toX509Certificate(certData)));
 		addCert.setOwner("gm2552@cerner.com");
 		
-		repo.save(addCert);
+		repo.save(addCert)
+		.as(StepVerifier::create) 
+		.expectNextCount(1) 
+		.verifyComplete();
 
 		
-		final Collection<Certificate> certificates = repo.findAll();
-		assertEquals(1, certificates.size());
-		
-		final Certificate cert = certificates.iterator().next();
+		final Certificate cert = repo.findAll().blockFirst();
 		
 		assertTrue(cert.isPrivateKey());
 

@@ -21,24 +21,28 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.config.repository;
 
-import java.util.Collection;
-
-import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
-import org.nhindirect.config.store.Domain;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface CertPolicyGroupDomainReltnRepository extends JpaRepository<CertPolicyGroupDomainReltn, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface CertPolicyGroupDomainReltnRepository extends ReactiveCrudRepository<CertPolicyGroupDomainReltn, Long>
 {
-	public Collection<CertPolicyGroupDomainReltn> findByDomain(Domain domain);
+	@Query("select * from certpolicygroupdomainreltn r where r.domain_id = :domainId")
+	public Flux<CertPolicyGroupDomainReltn> findByDomainId(Long domainId);
 	
+	@Query("delete from certpolicygroupdomainreltn r where r.domain_id = :domainId and r.policy_group_id = :policyGroupId")
 	@Transactional
-	public void deleteByDomainAndCertPolicyGroup(Domain domain, CertPolicyGroup policyGroup);
+	public Mono<Void> deleteByDomainIdAndCertPolicyGroupId(Long domainId, Long policyGroupId);
 	
+	@Query("delete from certpolicygroupdomainreltn where domain_id = :domainId")
 	@Transactional
-	public void deleteByDomain(Domain domain);
+	public Mono<Void> deleteByDomainId(Long domainId);
 	
+	@Query("delete from certpolicygroupdomainreltn where policy_group_id = :policyGroupId")
 	@Transactional
-	public void deleteByCertPolicyGroup(CertPolicyGroup policyGroup);
+	public Mono<Void> deleteByCertPolicyGroupId(Long policyGroupId);
 }

@@ -21,24 +21,29 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.config.repository;
 
-import java.util.Collection;
-
-import org.nhindirect.config.store.Domain;
-import org.nhindirect.config.store.TrustBundle;
 import org.nhindirect.config.store.TrustBundleDomainReltn;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface TrustBundleDomainReltnRepository extends JpaRepository<TrustBundleDomainReltn, Long>
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface TrustBundleDomainReltnRepository extends ReactiveCrudRepository<TrustBundleDomainReltn, Long>
 {
-	public Collection<TrustBundleDomainReltn> findByDomain(Domain domain);
+	@Transactional
+	@Query("select * from trustbundledomainreltn r where r.domain_id = :domainId")
+	public Flux<TrustBundleDomainReltn> findByDomainId(Long domainId);
 	
 	@Transactional
-	public void deleteByDomain(Domain domain);
+	@Query("delete from trustbundledomainreltn where domain_id = :domainId")
+	public Mono<Void> deleteByDomainId(Long domainId);
 	
 	@Transactional
-	public void deleteByTrustBundle(TrustBundle trustBundle);
+	@Query("delete from trustbundledomainreltn where trust_bundle_id = :trustBundleId")
+	public Mono<Void> deleteByTrustBundleId(Long trustBundleId);
 	
 	@Transactional
-	public void deleteByDomainAndTrustBundle(Domain domain, TrustBundle trustBundle);
+	@Query("delete from trustbundledomainreltn where domain_id = :domainId and trust_bundle_id = :trustBundleId")
+	public Mono<Void> deleteByDomainIdAndTrustBundleId(Long domainId, Long trustBundleId);
 }

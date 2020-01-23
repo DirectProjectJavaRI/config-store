@@ -22,7 +22,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package org.nhindirect.config.store.util;
 
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,19 +105,17 @@ public class CertificateUtils
     		
     		if (cert.getValidStartDate() == null && xcert != null)
     		{
-    			Calendar startDate = Calendar.getInstance();
-    			startDate.setTime(xcert.getNotBefore());
+    			LocalDateTime startDate = new Timestamp(xcert.getNotBefore().getTime()).toLocalDateTime();
     			cert.setValidStartDate(startDate);
     		}
     		if (cert.getValidEndDate() == null && xcert != null)
     		{
-    			Calendar endDate = Calendar.getInstance();
-    			endDate.setTime(xcert.getNotAfter());
+    			LocalDateTime endDate = new Timestamp(xcert.getNotAfter().getTime()).toLocalDateTime();
     			cert.setValidEndDate(endDate);
     		}
 
-    		if (cert.getStatus() == null)
-    			cert.setStatus(EntityStatus.NEW);
+    		if (cert.getStatus() < 0)
+    			cert.setStatus(EntityStatus.NEW.ordinal());
     		
     		cert.setPrivateKey(container != null && (container.getKey() != null || container.getWrappedKeyData() != null));
     		
