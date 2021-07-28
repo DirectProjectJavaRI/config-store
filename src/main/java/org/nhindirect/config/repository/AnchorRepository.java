@@ -24,7 +24,6 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.Anchor;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,20 +33,14 @@ import reactor.core.publisher.Mono;
 
 public interface AnchorRepository extends ReactiveCrudRepository<Anchor, Long>
 {
-	@Transactional
-	@Query("select * from anchor a where upper(a.owner) = upper(:owner)")
 	public Flux<Anchor> findByOwnerIgnoreCase(String owner);
 	
-	@Transactional
-	@Query("select * from anchor a where upper(a.owner) in upper(:owners)")
 	public Flux<Anchor> findByOwnerInIgnoreCase(@Param("owners") List<String> owners);
 	
 	@Transactional
-	@Query("delete from anchor where upper(owner) = upper(:owner)")
 	public Mono<Void> deleteByOwnerIgnoreCase(String owner);
 	
 	@Transactional
-	@Query("delete from anchor where id in (:ids)")
 	public Mono<Void>  deleteByIdIn(List<Long> ids);
 	
 }

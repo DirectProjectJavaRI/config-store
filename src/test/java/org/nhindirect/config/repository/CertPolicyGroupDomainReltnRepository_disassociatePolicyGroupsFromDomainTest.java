@@ -1,18 +1,17 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.test.StepVerifier;
 
-@Transactional
 public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupsFromDomainTest extends CertPolicyDaoBaseTest
 {
 	@Test
@@ -33,7 +32,7 @@ public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupsFromDo
 		.verifyComplete();
 		
 		final CertPolicyGroupDomainReltn addReltn = new CertPolicyGroupDomainReltn();
-		addReltn.setCertPolicyGroupId(group.getId());
+		addReltn.setPolicyGroupId(group.getId());
 		addReltn.setDomainId(domain.getId());
 		
 		

@@ -1,10 +1,11 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupReltn;
@@ -36,8 +37,8 @@ public class CertPolicyGroupRepository_removePolicyUseFromGroupTest extends Cert
 		.verifyComplete();
 		
 		CertPolicyGroupReltn reltn = new CertPolicyGroupReltn();
-		reltn.setCertPolicyId(policy.getId());
-		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setPolicyId(policy.getId());
+		reltn.setPolicyGroupId(group.getId());
 		reltn.setPolicyUse(CertPolicyUse.PUBLIC_RESOLVER.ordinal());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(false);
@@ -49,12 +50,12 @@ public class CertPolicyGroupRepository_removePolicyUseFromGroupTest extends Cert
 		.verifyComplete();
 		
 			
-		List<CertPolicyGroupReltn> assocGroups = groupReltRepo.findByGroupId(group.getId()).collectList().block();
+		List<CertPolicyGroupReltn> assocGroups = groupReltRepo.findByPolicyGroupId(group.getId()).collectList().block();
 		assertEquals(1, assocGroups.size());
 		
-		groupReltRepo.deleteByGroupId(group.getId()).block();
+		groupReltRepo.deleteByPolicyGroupId(group.getId()).block();
 		
-		assocGroups = groupReltRepo.findByGroupId(group.getId()).collectList().block();
+		assocGroups = groupReltRepo.findByPolicyGroupId(group.getId()).collectList().block();
 		assertEquals(0, assocGroups.size());		
 		
 	}

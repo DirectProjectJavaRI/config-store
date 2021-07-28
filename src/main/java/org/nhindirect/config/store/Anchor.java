@@ -31,13 +31,17 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * The JPA Domain class
  */
 @Table
+@Data
 public class Anchor {
 
     private String owner;
+    
     private String thumbprint;
     
     @Column("certificateId")
@@ -70,53 +74,11 @@ public class Anchor {
     @Column("forOutgoing")
     private boolean outgoing;
 
-    /**
-     * Get the value of owner.
-     * 
-     * @return the value of owner.
-     */
-    public String getOwner() {
-        return owner;
+    public void setCertificateData(byte[] data) throws CertificateException
+    {
+    	setData(data);
     }
-
-    /**
-     * Set the value of owner.
-     * 
-     * @param owner
-     *            The value of owner.
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    /**
-     * Get the value of thumbprint.
-     * 
-     * @return the value of thumbprint.
-     */
-    public String getThumbprint() {
-        return thumbprint;
-    }
-
-    /**
-     * Set the value of thumbprint.
-     * 
-     * @param thumbprint
-     *            The value of thumbprint.
-     */
-    public void setThumbprint(String thumbprint) {
-        this.thumbprint = thumbprint;
-    }
-
-    /**
-     * Get the value of certificateData.
-     * 
-     * @return the value of certificateData.
-     */
-    public byte[] getData() {
-        return certificateData;
-    }
-
+    
     /**
      * Set the value of certificateData.
      * 
@@ -132,159 +94,6 @@ public class Anchor {
             loadCertFromData();
         }
     }
-
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Set the value of id.
-     * 
-     * @param id
-     *            The value of id.
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    /**
-     * Get the value of createTime.
-     * 
-     * @return the value of createTime.
-     */
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Set the value of createTime.
-     * 
-     * @param timestamp
-     *            The value of createTime.
-     */
-    public void setCreateTime(LocalDateTime timestamp) {
-        createTime = timestamp;
-    }
-
-    /**
-     * Get the value of validStartDate.
-     * 
-     * @return the value of validStartDate.
-     */
-    public LocalDateTime getValidStartDate() {
-        return validStartDate;
-    }
-
-    /**
-     * Set the value of validStartDate.
-     * 
-     * @param validStartDate
-     *            The value of validStartDate.
-     */
-    public void setValidStartDate(LocalDateTime validStartDate) {
-        this.validStartDate = validStartDate;
-    }
-
-    /**
-     * Get the value of validEndDate.
-     * 
-     * @return the value of validEndDate.
-     */
-    public LocalDateTime getValidEndDate() {
-        return validEndDate;
-    }
-
-    /**
-     * Set the value of validEndDate.
-     * 
-     * @param validEndDate
-     *            The value of validEndDate.
-     */
-    public void setValidEndDate(LocalDateTime validEndDate) {
-        this.validEndDate = validEndDate;
-    }
-
-    /**
-     * Get the value of status.
-     * 
-     * @return the value of status.
-     */
-    public int getStatus() {
-        return status;
-    }
-
-    /**
-     * Set the value of status.
-     * 
-     * @param status
-     *            The value of status.
-     */
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    /**
-     * Get the value of incoming.
-     * 
-     * @return the value of incoming.
-     */
-    public boolean isIncoming() {
-        return incoming;
-    }
-
-    /**
-     * Set the value of incoming.
-     * 
-     * @param incoming
-     *            The value of incoming.
-     */
-    public void setIncoming(boolean incoming) {
-        this.incoming = incoming;
-    }
-
-    /**
-     * Get the value of outgoing.
-     * 
-     * @return the value of outgoing.
-     */
-    public boolean isOutgoing() {
-        return outgoing;
-    }
-
-    /**
-     * Set the value of outgoing.
-     * 
-     * @param outgoing
-     *            The value of outgoing.
-     */
-    public void setOutgoing(boolean outgoing) {
-        this.outgoing = outgoing;
-    }
-
-    /**
-     * Get the value of certificateId.
-     * 
-     * @return the value of certificateId.
-     */
-    public long getCertificateId() {
-        return certificateId;
-    }
-
-    /**
-     * Set the value of certificateId.
-     * 
-     * @param certificateId
-     *            The value of certificateId.
-     */
-    public void setCertificateId(long certificateId) {
-        this.certificateId = certificateId;
-    }
-
     private X509Certificate loadCertFromData() throws CertificateException {
         X509Certificate cert = null;
         try {

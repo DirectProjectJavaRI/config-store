@@ -33,12 +33,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * JPA entity object for a trust bundle anchor
  * @author Greg Meyer
  * @since 1.2
  */
 @Table("trustbundleanchor")
+@Data
 public class TrustBundleAnchor 
 {
 	@Id
@@ -58,80 +61,11 @@ public class TrustBundleAnchor
     @Column("validEndDate")
     private LocalDateTime validEndDate;
     
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    public Long getId() 
+    public void setAnchorData(byte[] data) throws CertificateException 
     {
-        return id;
-    }
-
-    /**
-     * Set the value of id.
-     * 
-     * @param id
-     *            The value of id.
-     */
-    public void setId(Long id) 
-    {
-        this.id = id;
-    } 
-    
-    /**
-     * Get the value of thumbprint.
-     * 
-     * @return the value of thumbprint.
-     */
-    public String getThumbprint() 
-    {
-        return thumbprint;
-    }
-
-    /**
-     * Set the value of thumbprint.
-     * 
-     * @param thumbprint
-     *            The value of thumbprint.
-     */
-    public void setThumbprint(String thumbprint) 
-    {
-        this.thumbprint = thumbprint;
-    }    
-    
-    /**
-     * Get the value of the trust bundle Id.
-     * 
-     * @return the value of trust bundle Id.
-     */
-    public Long getTrustBundleId() 
-    {
-        return trustBundleId;
-    }
-
-    /**
-     * Set the value of the trust bundle Id.
-     * 
-     * @param trustBundleId
-     *            The value of the trust bundle Id.
-     */
-    public void setTrustBundleId(Long trustBundleId) 
-    {
-        this.trustBundleId = trustBundleId;
-
+    	setData(data);
     }
     
-    /**
-     * Get the value of anchorData.
-     * 
-     * @return the value of anchorData Data.
-     */
-    public byte[] getData() 
-    {
-        return anchorData;
-    }
-
     /**
      * Set the value of anchorData.
      * 
@@ -152,46 +86,6 @@ public class TrustBundleAnchor
         }
     }    
     
-    /**
-     * Get the value of validStartDate.
-     * 
-     * @return the value of validStartDate.
-     */
-    public LocalDateTime getValidStartDate() 
-    {
-        return validStartDate;
-    }
-
-    /**
-     * Set the value of validStartDate.
-     * 
-     * @param validStartDate
-     *            The value of validStartDate.
-     */
-    public void setValidStartDate(LocalDateTime validStartDate) 
-    {
-        this.validStartDate = validStartDate;
-    }
-
-    /**
-     * Get the value of validEndDate.
-     * 
-     * @return the value of validEndDate.
-     */
-    public LocalDateTime getValidEndDate() 
-    {
-        return validEndDate;
-    }
-
-    /**
-     * Set the value of validEndDate.
-     * 
-     * @param validEndDate
-     *            The value of validEndDate.
-     */
-    public void setValidEndDate(LocalDateTime validEndDate) {
-        this.validEndDate = validEndDate;
-    }    
     
     private X509Certificate loadCertFromData() throws CertificateException 
     {

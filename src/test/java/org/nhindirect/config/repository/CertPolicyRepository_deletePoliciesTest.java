@@ -1,19 +1,19 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
 import org.nhindirect.policy.PolicyLexicon;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.test.StepVerifier;
 
-@Transactional
+
 public class CertPolicyRepository_deletePoliciesTest extends CertPolicyDaoBaseTest
 {
 	@Test

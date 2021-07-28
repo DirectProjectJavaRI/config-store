@@ -1,13 +1,13 @@
 package org.nhindirect.config.repository;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.SpringBaseTest;
-import org.nhindirect.config.repository.TrustBundleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import reactor.test.StepVerifier;
@@ -40,7 +40,7 @@ public abstract class TrustBundleDaoBaseTest extends SpringBaseTest
 		return FileUtils.readFileToByteArray(fl);
 	}
 	
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		super.setUp();
@@ -52,7 +52,7 @@ public abstract class TrustBundleDaoBaseTest extends SpringBaseTest
 		clearDomains();
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown()
 	{
 		clearRetlns();

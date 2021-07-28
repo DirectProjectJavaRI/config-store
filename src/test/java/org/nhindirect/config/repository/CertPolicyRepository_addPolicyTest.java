@@ -1,13 +1,15 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
 import org.nhindirect.policy.PolicyLexicon;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,31 +46,33 @@ public class CertPolicyRepository_addPolicyTest extends CertPolicyDaoBaseTest
 	}
 	
 	
-	@Test(expected=DataIntegrityViolationException.class)
+	@Test
 	public void testAddPolicy_addExistingPolicy_assertException()
 	{
-		
-		CertPolicy policy = new CertPolicy();
-		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML.ordinal());
-		policy.setPolicyData(new byte[] {1,2,3});
-		
-		polRepo.save(policy)
-		.as(StepVerifier::create) 
-		.expectNextCount(1) 
-		.verifyComplete();
-		
-		Collection<CertPolicy> policies = polRepo.findAll().collectList().block();
-		
-		assertEquals(1, policies.size());
-		
-		
-		policy = new CertPolicy();
-		policy.setPolicyName("Test PolicY");
-		policy.setLexicon(PolicyLexicon.XML.ordinal());
-		policy.setPolicyData(new byte[] {1,2,3});
-		
-		polRepo.save(policy).block();
+		Assertions.assertThrows(DataIntegrityViolationException.class, () ->
+		{
+			CertPolicy policy = new CertPolicy();
+			policy.setPolicyName("Test PolicY");
+			policy.setLexicon(PolicyLexicon.XML.ordinal());
+			policy.setPolicyData(new byte[] {1,2,3});
+			
+			polRepo.save(policy)
+			.as(StepVerifier::create) 
+			.expectNextCount(1) 
+			.verifyComplete();
+			
+			Collection<CertPolicy> policies = polRepo.findAll().collectList().block();
+			
+			assertEquals(1, policies.size());
+			
+			
+			policy = new CertPolicy();
+			policy.setPolicyName("Test PolicY");
+			policy.setLexicon(PolicyLexicon.XML.ordinal());
+			policy.setPolicyData(new byte[] {1,2,3});
+			
+			polRepo.save(policy).block();
+		});
 	
 	}	
 }

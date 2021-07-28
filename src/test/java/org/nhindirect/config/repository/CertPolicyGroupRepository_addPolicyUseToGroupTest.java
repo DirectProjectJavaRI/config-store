@@ -1,12 +1,13 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicy;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupReltn;
@@ -39,8 +40,8 @@ public class CertPolicyGroupRepository_addPolicyUseToGroupTest extends CertPolic
 		.verifyComplete();
 		
 		CertPolicyGroupReltn reltn = new CertPolicyGroupReltn();
-		reltn.setCertPolicyId(policy.getId());
-		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setPolicyId(policy.getId());
+		reltn.setPolicyGroupId(group.getId());
 		reltn.setPolicyUse(CertPolicyUse.PUBLIC_RESOLVER.ordinal());
 		reltn.setIncoming(true);
 		reltn.setOutgoing(false);
@@ -50,12 +51,12 @@ public class CertPolicyGroupRepository_addPolicyUseToGroupTest extends CertPolic
 		.expectNextCount(1) 
 		.verifyComplete();
 		
-		final List<CertPolicyGroupReltn> assocGroups = groupReltRepo.findByGroupId(group.getId()).collectList().block();
+		final List<CertPolicyGroupReltn> assocGroups = groupReltRepo.findByPolicyGroupId(group.getId()).collectList().block();
 		assertEquals(1, assocGroups.size());
 		reltn = assocGroups.get(0);
 		
-		assertEquals(policy.getId(), reltn.getCertPolicyId());
-		assertEquals(group.getId(), reltn.getCertPolicyGroupId());
+		assertEquals(policy.getId(), reltn.getPolicyId());
+		assertEquals(group.getId(), reltn.getPolicyGroupId());
 		assertEquals(CertPolicyUse.PUBLIC_RESOLVER.ordinal(), reltn.getPolicyUse());
 		assertTrue(reltn.isIncoming());
 		assertFalse(reltn.isOutgoing());

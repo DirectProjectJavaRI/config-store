@@ -1,18 +1,17 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.test.StepVerifier;
 
-@Transactional
 public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupFromDomainTest extends CertPolicyDaoBaseTest
 {
 	@Test
@@ -33,7 +32,7 @@ public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupFromDom
 		.verifyComplete();
 		
 		final CertPolicyGroupDomainReltn addreltn = new CertPolicyGroupDomainReltn();
-		addreltn.setCertPolicyGroupId(group.getId());
+		addreltn.setPolicyGroupId(group.getId());
 		addreltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(addreltn)
@@ -44,7 +43,7 @@ public class CertPolicyGroupDomainReltnRepository_disassociatePolicyGroupFromDom
 		Collection<CertPolicyGroupDomainReltn> reltn = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(1, reltn.size());
 		
-		reltnRepo.deleteByDomainIdAndCertPolicyGroupId(domain.getId(), group.getId()).block();
+		reltnRepo.deleteByDomainIdAndPolicyGroupId(domain.getId(), group.getId()).block();
 		
 		reltn = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(0, reltn.size());

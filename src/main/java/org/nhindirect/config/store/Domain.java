@@ -27,10 +27,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * The JPA Domain class
  */
 @Table
+@Data
 public class Domain 
 {
 
@@ -40,10 +43,10 @@ public class Domain
     private String domainName;
 
     @Column("createTime")
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
 
     @Column("updateTime")
-    private LocalDateTime updateTime;
+    private LocalDateTime updateTime = LocalDateTime.now();
 
     @Column("postmasterAddressId")
     private Long postmasterAddressId;
@@ -52,141 +55,6 @@ public class Domain
     private Long id;
 
     private int status = EntityStatus.NEW.ordinal();
-
-    /**
-     * Construct a Domain.
-     */
-    public Domain() {
-    }
-
-    /**
-     * Construct a Domain.
-     * 
-     * @param aName
-     *            The domain name.
-     */
-    public Domain(String aName) {
-        setDomainName(aName);
-        setCreateTime(LocalDateTime.now());
-        setUpdateTime(LocalDateTime.now());
-        setStatus(EntityStatus.NEW.ordinal());
-    }
-
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    public Long getId() 
-    {
-        return id;
-    }
-
-    /**
-     * Set the value of id.
-     * 
-     * @param anId
-     *            The value of id.
-     */
-    public void setId(Long anId) {
-        id = anId;
-    }
-
-    /**
-     * Get the value of domainName.
-     * 
-     * @return the value of domainName.
-     */
-    public String getDomainName() {
-        return domainName;
-    }
-
-    /**
-     * Get the value of createTime.
-     * 
-     * @return the value of createTime.
-     */
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Get the value of postmasterAddressId.
-     * 
-     * @return the value of postmasterAddressId.
-     */
-    public Long getPostmasterAddressId() {
-        return postmasterAddressId;
-    }
-
-    /**
-     * Set the value of postmasterAddressId.
-     * 
-     * @param anId
-     *            The value of postmasterAddressId.
-     */
-    public void setPostmasterAddressId(Long anId) {
-        postmasterAddressId = anId;
-    }
-
-    /**
-     * Get the value of updateTime.
-     * 
-     * @return the value of updateTime.
-     */
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Get the value of status.
-     * 
-     * @return the value of status.
-     */
-    public int getStatus() {
-        return status;
-    }
-
-    /**
-     * Set the value of domainName.
-     * 
-     * @param aName
-     *            The value of domainName.
-     */
-    public void setDomainName(String aName) {
-        domainName = aName;
-    }
-
-    /**
-     * Set the value of createTime.
-     * 
-     * @param timestamp
-     *            The value of createTime.
-     */
-    public void setCreateTime(LocalDateTime timestamp) {
-        createTime = timestamp;
-    }
-
-    /**
-     * Set the value of updateTime.
-     * 
-     * @param timestamp
-     *            The value of updateTime.
-     */
-    public void setUpdateTime(LocalDateTime timestamp) {
-
-        updateTime = timestamp;
-    }
-
-    /**
-     * Set the value of status.
-     * 
-     * @param aStatus
-     *            The value of status.
-     */
-    public void setStatus(int aStatus) {
-        status = aStatus;
-    }
 
     /**
      * Verify the Domain is valid.
@@ -215,24 +83,4 @@ public class Domain
         return "[ID: " + getId() + " | Domain: " + getDomainName() + " | Status: " + EntityStatus.values()[getStatus()].toString() + "]";
     }
 
-    @Override
-    public boolean equals(Object other)
-    {
-    	boolean result = false;
-    	if (other == null)
-    		return false;
-    	
-    	if (other instanceof Domain)
-    	{
-    		final Domain otherDomain = (Domain)other;
-    		if (otherDomain.id == this.id && otherDomain.domainName.equals(domainName) && otherDomain.postmasterAddressId == postmasterAddressId
-    				&& otherDomain.status == status)
-    		{
-    				result = true;
-    		}
-    	}
-    	
-    	return result;
-    }
-    
 }

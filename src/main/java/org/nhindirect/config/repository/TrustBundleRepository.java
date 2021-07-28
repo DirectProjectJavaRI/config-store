@@ -22,18 +22,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.config.repository;
 
-
-
 import org.nhindirect.config.store.TrustBundle;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Mono;
 
 public interface TrustBundleRepository extends ReactiveCrudRepository<TrustBundle, Long>
 {
-	@Transactional
-	@Query("select * from trustbundle b where upper(b.bundleName) = upper(:bundleName)")
 	public Mono<TrustBundle> findByBundleNameIgnoreCase(String bundleName);
 }

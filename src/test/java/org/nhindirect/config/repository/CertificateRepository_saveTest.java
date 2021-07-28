@@ -1,13 +1,14 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.model.utils.CertUtils;
@@ -26,10 +27,10 @@ public class CertificateRepository_saveTest extends SpringBaseTest
 		CryptoExtensions.registerJCEProviders();
 	}	
 	
-	@Before
+	@BeforeEach
 	public void cleanDataBase()
 	{
-		repo.deleteAll();
+		repo.deleteAll().block();
 	}
 	
 	@Test

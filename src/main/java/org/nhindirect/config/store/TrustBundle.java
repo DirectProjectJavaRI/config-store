@@ -30,12 +30,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * JPA entity object for a trust bundle
  * @author Greg Meyer
  * @since 1.2
  */
 @Table("trustbundle")
+@Data
 public class TrustBundle 
 {
 	@Id
@@ -51,7 +54,7 @@ public class TrustBundle
     private byte[] signingCertificateData;
 	
 	@Column("refreshInterval")	
-    private int refreshInterval;
+    private int refreshInterval = 0;
 	
 	@Column("lastRefreshAttempt")		
     private LocalDateTime lastRefreshAttempt;
@@ -63,228 +66,10 @@ public class TrustBundle
     private LocalDateTime lastSuccessfulRefresh;
 
 	@Column("createTime")	
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
 	
 	@Column("getCheckSum")	
-    private String checkSum;
-    
-    public TrustBundle()
-    {
-    	createTime = LocalDateTime.now();
-    	refreshInterval = 0;
-    	checkSum = "";
-    }
-    
-    public Long getId() 
-    {
-        return id;
-    }
-
-    /**
-     * Set the value of id.
-     * 
-     * @param id
-     *            The value of id.
-     */
-    public void setId(Long id) 
-    {
-        this.id = id;
-    } 
-    
-
-    /**
-     * Gets the value of the bundle name.  The bundle name must be unique
-     * 
-     * @return the value of the bundle name
-     */
-    public String getBundleName()
-    {
-    	return bundleName;
-    }
-    
-    /**
-     * Set the value of the bundle name.  
-     * 
-     * @param bundleName
-     *            The value of the bundleName
-     */
-    public void setBundleName(String bundleName)
-    {
-    	this.bundleName = bundleName;
-    }
-    
-    /**
-     * Gets the value of the bundle URL.  The URL specifies the location of the bundle
-     * 
-     * @return the value of the bundle URL
-     */
-    public String getBundleURL()
-    {
-    	return bundleURL;
-    }
-    
-    /**
-     * Set the value of the bundle url.  
-     * 
-     * @param bundleURL
-     *            The value of the bundle URL
-     */    
-    public void setBundleURL(String bundleURL)
-    {
-    	this.bundleURL = bundleURL;
-    }    
-    
-    /**
-     * Gets the value of the signing certificate as it DER encoded byte array.  The signing certificate validates the authenticity of a bundle. 
-     * It is optional and only used with signed bundles.
-     * 
-     * @return the value of the signing certificate
-     */
-    public byte[] getSigningCertificateData() 
-    {
-        return signingCertificateData;
-    }
-
-    /**
-     * Set the value of the signing certificate
-     * 
-     * @param signingCertificateData
-     *            The value of the signing certificate
-     */  
-    public void setSigningCertificateData(byte[] signingCertificateData) throws CertificateException 
-    {
-    	this.signingCertificateData = signingCertificateData;
-    }    
-
-    /**
-     * Gets the value of the bundle refresh interval in seconds.
-     * 
-     * @return the value of the bundle refresh interval
-     */    
-    public int getRefreshInterval() 
-    {
-        return refreshInterval;
-    }
-
-    /**
-     * Set the value of the bundle refresh interval in seconds
-     * 
-     * @param refreshInterval
-     *            The value of the bundle refresh interval
-     */  
-    public void setRefreshInterval(int refreshInterval) 
-    {
-    	this.refreshInterval = refreshInterval;
-    } 
-    
-    /**
-     * Get the value of createTime.
-     * 
-     * @return the value of createTime.
-     */
-    public LocalDateTime getCreateTime() 
-    {
-        return createTime;
-    }
-
-    /**
-     * Set the value of createTime.
-     * 
-     * @param timestamp
-     *            The value of createTime.
-     */
-    public void setCreateTime(LocalDateTime timestamp) 
-    {
-        createTime = timestamp;
-    }    
-
-    /**
-     * Get the value of the last successful refresh date time.  This time represents
-     * the last time a successful refresh operation was performed.
-     * 
-     * @return the value of the last successful refresh date time.
-     */
-    public LocalDateTime getLastSuccessfulRefresh() 
-    {
-        return lastSuccessfulRefresh;
-    }
-
-    /**
-     * Set the value of the last successful refresh date time
-     * 
-     * @param lastSuccessfulRefresh
-     *            The value of the last successful refresh date time
-     */    
-    public void setLastSuccessfulRefresh(LocalDateTime lastSuccessfulRefresh) 
-    {
-        this.lastSuccessfulRefresh = lastSuccessfulRefresh;
-    }  
- 
-    /**
-     * Get the value of the last refresh attempt date time.  This time represents
-     * the last time a refresh operation was attempted.  It is updated regardless
-     * if the refresh operation is successful or not.
-     * 
-     * @return the value of the last refresh attempt date time
-     */
-    public LocalDateTime getLastRefreshAttempt() 
-    {
-        return lastRefreshAttempt;
-    }
-
-    /**
-     * Set the value of the last refresh attempt date time.
-     * 
-     * @param lastRefreshAttempt
-     *            The value of the last refresh attempt date time.
-     */  
-    public void setLastRefreshAttempt(LocalDateTime lastRefreshAttempt) 
-    {
-        this.lastRefreshAttempt = lastRefreshAttempt;
-    }  
-    
-    /**
-     * Get the value of the last refresh error.  
-     * 
-     * @return the value of the last refresh error.
-     */    
-    public int getLastRefreshError() 
-    {
-        return lastRefreshError;
-    }
-
-    /**
-     * Set the value of the last refresh error.
-     * 
-     * @param lastRefreshError
-     *            The value of the last refresh error.
-     */     
-    public void setLastRefreshError(int lastRefreshError) 
-    {
-    	this.lastRefreshError = lastRefreshError;
-    } 
-
-
-    /**
-     * Get the value of the bundle check sum.  
-     * 
-     * @return collection of the bundle check sum.  
-     */ 
-    public String getCheckSum()
-    {
-    	return checkSum;
-    }
-   
-    /**
-     * Set the value of the bundle check sum. 
-     * 
-     * @param checkSum
-     *            The value of the bundle check sum. 
-     */  
-    public void setCheckSum(String checkSum)
-    {
-    	this.checkSum = checkSum;
-    }
+    private String checkSum = "";
     
     /**
      * Converts the signing data into an X509 certificate

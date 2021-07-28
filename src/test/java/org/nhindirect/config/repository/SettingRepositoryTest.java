@@ -1,13 +1,14 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.store.EntityStatus;
 import org.nhindirect.config.store.Setting;
@@ -37,7 +38,7 @@ public class SettingRepositoryTest extends SpringBaseTest
 		repo.save(newSetting(name, value)).block();
 	}	
 	
-	@Before
+	@BeforeEach
 	public void cleanDataBase()
 	{
 		repo.deleteAll()

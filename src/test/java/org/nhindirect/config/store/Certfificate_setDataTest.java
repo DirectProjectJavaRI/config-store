@@ -3,10 +3,10 @@ package org.nhindirect.config.store;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.nhindirect.config.model.utils.CertUtils;
 import org.nhindirect.config.repository.CertificateRepositoryTest;
-import org.nhindirect.config.store.Certificate;
+
 
 public class Certfificate_setDataTest 
 {

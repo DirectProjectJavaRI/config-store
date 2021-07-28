@@ -38,10 +38,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * The JPA Certificate class
  */
 @Table
+@Data
 public class Certificate 
 {
 
@@ -50,7 +53,6 @@ public class Certificate
 		CryptoExtensions.registerJCEProviders();
 	}	
 	
-
     public static final byte[] NULL_CERT = new byte[] {};
 
     private String owner;
@@ -63,7 +65,7 @@ public class Certificate
     private byte[] data;
     
     @Column("createTime")
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
     
     @Column("validStartDate")
     private LocalDateTime validStartDate;
@@ -80,39 +82,6 @@ public class Certificate
     
     @Column("privateKey")
     private boolean privateKey;
-
-    public Certificate()
-    {
-    	createTime = LocalDateTime.now();
-    }
-    
-    /**
-     * Get the value of owner.
-     * 
-     * @return the value of owner.
-     */
-    public String getOwner() {
-        return owner;
-    }
-
-    /**
-     * Set the value of owner.
-     * 
-     * @param owner
-     *            The value of owner.
-     */
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    /**
-     * Get the value of data.
-     * 
-     * @return the value of data.
-     */
-    public byte[] getData() {
-        return data;
-    }
 
     /**
      * Set the value of data.
@@ -135,135 +104,6 @@ public class Certificate
     	this.data = data;
     }
     
-    /**
-     * Indicates if the certificate has a private key
-     * 
-     * @return 
-     */
-    public boolean isPrivateKey() {
-        return privateKey;
-    }
-
-    /**
-     * Indicates if the certificate has a private key
-     * 
-     * @param data
-     *            
-     * @throws CertificateException
-     */
-    public void setPrivateKey(boolean b) throws CertificateException {
-        this.privateKey = b;
-    }    
-    
-    private void setThumbprint(String aThumbprint) {
-        thumbprint = aThumbprint;
-
-    }
-
-    /**
-     * Get the value of thumbprint.
-     * 
-     * @return the value of thumbprint.
-     */
-    public String getThumbprint() {
-        return thumbprint;
-    }
-
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Set the value of id.
-     * 
-     * @param id
-     *            The value of id.
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    /**
-     * Get the value of createTime.
-     * 
-     * @return the value of createTime.
-     */
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Set the value of createTime.
-     * 
-     * @param timestamp
-     *            The value of createTime.
-     */
-    public void setCreateTime(LocalDateTime timestamp) {
-        createTime = timestamp;
-    }
-
-    /**
-     * Get the value of status.
-     * 
-     * @return the value of status.
-     */
-    public int getStatus() {
-        return status;
-    }
-
-    /**
-     * Set the value of status.
-     * 
-     * @param status
-     *            The value of status.
-     */
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    /**
-     * Get the value of validStartDate.
-     * 
-     * @return the value of validStartDate.
-     */
-    public LocalDateTime getValidStartDate() {
-        return validStartDate;
-    }
-
-    /**
-     * Set the value of validStartDate.
-     * 
-     * @param validStartDate
-     *            The value of validStartDate.
-     */
-    public void setValidStartDate(LocalDateTime validStartDate) {
-        this.validStartDate = validStartDate;
-    }
-
-    /**
-     * Get the value of validEndDate.
-     * 
-     * @return the value of validEndDate.
-     */
-    public LocalDateTime getValidEndDate() {
-        return validEndDate;
-    }
-
-    /**
-     * Set the value of validEndDate.
-     * 
-     * @param validEndDate
-     *            The value of validEndDate.
-     */
-    public void setValidEndDate(LocalDateTime validEndDate) {
-        this.validEndDate = validEndDate;
-    }
-
     /**
      * Validate the Certificate for the existance of data.
      * 

@@ -25,7 +25,6 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.Certificate;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,23 +33,15 @@ import reactor.core.publisher.Mono;
 
 public interface CertificateRepository extends ReactiveCrudRepository<Certificate, Long>
 {
-	@Transactional
-	@Query("select * from certificate c where upper(c.owner) = upper(:owner)")
 	public Flux<Certificate> findByOwnerIgnoreCase(String owner);
 	
-	@Transactional
-	@Query("select * from certificate c where upper(c.owner) = upper(:owner) and c.thumbprint = :tp")
 	public Mono<Certificate> findByOwnerIgnoreCaseAndThumbprint(String owner, String tp);
 	
-	@Transactional
-	@Query("select * from certificate c where c.thumbprint = :tp")
 	public Flux<Certificate> findByThumbprint(String tb);
 	
 	@Transactional
-	@Query("delete from certificate where upper(owner) = upper(:owner)")
 	public Mono<Void> deleteByOwnerIgnoreCase(String owner);
 	
 	@Transactional
-	@Query("delete from certificate where id in (:ids)")
 	public Mono<Void> deleteByIdIn(List<Long> ids);
 }

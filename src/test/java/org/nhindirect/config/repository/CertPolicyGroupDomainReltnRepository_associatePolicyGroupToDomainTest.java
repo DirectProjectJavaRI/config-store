@@ -1,10 +1,11 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
@@ -31,7 +32,7 @@ public class CertPolicyGroupDomainReltnRepository_associatePolicyGroupToDomainTe
 		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setPolicyGroupId(group.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -42,7 +43,7 @@ public class CertPolicyGroupDomainReltnRepository_associatePolicyGroupToDomainTe
 		final Collection<CertPolicyGroupDomainReltn> groupReltn = reltnRepo.findByDomainId(domain.getId()).collectList().block();
 		assertEquals(1, groupReltn.size());
 		reltn = groupReltn.iterator().next();
-		assertEquals(group.getId(), reltn.getCertPolicyGroupId());
+		assertEquals(group.getId(), reltn.getPolicyGroupId());
 		assertEquals(domain.getId(), reltn.getDomainId());
 	}
 }

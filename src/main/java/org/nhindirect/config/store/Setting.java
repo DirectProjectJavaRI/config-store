@@ -22,11 +22,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * The JPA settings class.  This tables holds various configuration settings such as how the configuration service should behave or settings
  * for a gateway.  This structure is made up of simple name value pairs. 
  */
 @Table
+@Data
 public class Setting 
 {
     private String name;
@@ -42,118 +45,4 @@ public class Setting
     private LocalDateTime updateTime;
     
     private int status = EntityStatus.NEW.ordinal();
-    
-    /**
-     * Get the name of the setting.
-     * 
-     * @return the name of the setting.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Set the name of the setting.
-     * 
-     * @param name
-     *            The name of setting.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }    
-    
-    /**
-     * Get the value of the setting.
-     * 
-     * @return the value of the setting.
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Set the name of the setting.
-     * 
-     * @param name
-     *            The value of setting.
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }      
-    
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Set the value of id.
-     * 
-     * @param id
-     *            The value of id.
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    /**
-     * Get the value of status.
-     * 
-     * @return the value of status.
-     */
-    public int getStatus() {
-        return status;
-    }
-
-    /**
-     * Set the value of status.
-     * 
-     * @param status
-     *            The value of status.
-     */
-    public void setStatus(int status) {
-        this.status = status;
-    }
-    
-    /**
-     * Get the value of createTime.
-     * 
-     * @return the value of createTime.
-     */
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    /**
-     * Set the value of createTime.
-     * 
-     * @param timestamp
-     *            The value of createTime.
-     */
-    public void setCreateTime(LocalDateTime timestamp) {
-        createTime = timestamp;
-    }   
-    
-    /**
-     * Get the value of updateTime.
-     * 
-     * @return the value of updateTime.
-     */
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * Set the value of updateTime.
-     * 
-     * @param timestamp
-     *            The value of updateTime.
-     */
-    public void setUpdateTime(LocalDateTime timestamp) {
-        updateTime = timestamp;
-    }     
 }
