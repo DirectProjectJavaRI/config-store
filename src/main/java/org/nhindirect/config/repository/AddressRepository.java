@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.nhindirect.config.store.Address;
 import org.nhindirect.config.store.EntityStatus;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 import reactor.core.publisher.Flux;
@@ -33,21 +32,15 @@ import reactor.core.publisher.Mono;
 
 public interface AddressRepository extends ReactiveCrudRepository<Address, Long>
 {
-	@Query("select * from address a where upper(a.emailAddress) = upper(:emailAddress)")
 	public Mono<Address> findByEmailAddressIgnoreCase(String emailAddress);
 	
-	@Query("select * from address a where upper(a.endpoint) = upper(:endpoint)")
 	public Flux<Address> findByEndpointIgnoreCase(String endpoint);
 	
-	@Query("select * from address a where upper(a.emailAddress) in (:emailAddresses) and a.status = :status")
 	public Flux<Address> findByEmailAddressInIgnoreCaseAndStatus(List<String> emailAddresses, EntityStatus status);
 	
-	@Query("select * from address a where a.domainId = :domainId")
 	public Flux<Address> findByDomainId(Long domainId);
 	
-	@Query("delete from address where domainId = :domainId")
 	public Mono<Void> deleteByDomainId(Long domainId);
 	
-	@Query("delete from address where upper(emailAddress) = upper(:emailAddress)")
 	public Mono<Void> deleteByEmailAddressIgnoreCase(String emailAddress);
 }

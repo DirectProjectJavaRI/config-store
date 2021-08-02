@@ -1,6 +1,8 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,17 +16,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.store.Certificate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.test.StepVerifier;
 
-@Transactional
 public class CertificateRepositoryTest extends SpringBaseTest
 {
 	private static final String certBasePath = "src/test/resources/certs/"; 
@@ -37,7 +35,7 @@ public class CertificateRepositoryTest extends SpringBaseTest
 		CryptoExtensions.registerJCEProviders();
 	}	
 	
-	@Before
+	@BeforeEach
 	public void cleanDataBase()
 	{
 		repo.deleteAll().block();

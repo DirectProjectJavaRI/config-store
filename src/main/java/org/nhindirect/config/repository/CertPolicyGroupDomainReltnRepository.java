@@ -22,7 +22,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package org.nhindirect.config.repository;
 
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,18 +30,14 @@ import reactor.core.publisher.Mono;
 
 public interface CertPolicyGroupDomainReltnRepository extends ReactiveCrudRepository<CertPolicyGroupDomainReltn, Long>
 {
-	@Query("select * from certpolicygroupdomainreltn r where r.domain_id = :domainId")
 	public Flux<CertPolicyGroupDomainReltn> findByDomainId(Long domainId);
 	
-	@Query("delete from certpolicygroupdomainreltn r where r.domain_id = :domainId and r.policy_group_id = :policyGroupId")
 	@Transactional
-	public Mono<Void> deleteByDomainIdAndCertPolicyGroupId(Long domainId, Long policyGroupId);
+	public Mono<Void> deleteByDomainIdAndPolicyGroupId(Long domainId, Long policyGroupId);
 	
-	@Query("delete from certpolicygroupdomainreltn where domain_id = :domainId")
 	@Transactional
 	public Mono<Void> deleteByDomainId(Long domainId);
 	
-	@Query("delete from certpolicygroupdomainreltn where policy_group_id = :policyGroupId")
 	@Transactional
-	public Mono<Void> deleteByCertPolicyGroupId(Long policyGroupId);
+	public Mono<Void> deleteByPolicyGroupId(Long policyGroupId);
 }

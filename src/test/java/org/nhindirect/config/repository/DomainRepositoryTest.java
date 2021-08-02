@@ -1,33 +1,29 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
 import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.store.Address;
 import org.nhindirect.config.store.Domain;
 import org.nhindirect.config.store.EntityStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.test.StepVerifier;
 
-@Transactional
+@Slf4j
 public class DomainRepositoryTest  extends SpringBaseTest
-{
-
-	private static final Log log = LogFactory.getLog(DomainRepositoryTest.class);
-	
+{	
 	@Autowired
 	private DomainRepository domRepo;
 	
@@ -41,7 +37,7 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	 * are needed, the execute the dependent tests from within that executing test. 
 	 */
 	
-	@Before
+	@BeforeEach
 	public void cleanDataBase()
 	{
 		addRepo.deleteAll()
@@ -71,7 +67,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	public void testAddDomain() 
 	{
 
-		Domain domain = new Domain("health.testdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.testdomain.com");
 		domain.setStatus(EntityStatus.ENABLED.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -82,7 +79,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Test
 	public void testGetByDomain() 
 	{
-		Domain domain = new Domain("health.testdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.testdomain.com");
 		domain.setStatus(EntityStatus.ENABLED.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -90,8 +88,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 		.verifyComplete();
 		
 		Domain testDomain = domRepo.findByDomainNameIgnoreCase("health.testdomain.com").block();
-		log.info("Newly added Domain ID is: " + testDomain.getId());
-		log.info("Newly added Domain Status is: " + testDomain.getStatus());
+		log.info("Newly added Domain ID is: {}", testDomain.getId());
+		log.info("Newly added Domain Status is: {}", testDomain.getStatus());
 		
 		assertTrue(testDomain.getDomainName().equals("health.testdomain.com"));
 	}
@@ -99,7 +97,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Test
 	public void testUpdateDomain() 
 	{
-		Domain domain = new Domain("health.testdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.testdomain.com");
 		domain.setStatus(EntityStatus.ENABLED.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -107,8 +106,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 		.verifyComplete();
 		
 		Domain testDomain = domRepo.findByDomainNameIgnoreCase("health.testdomain.cOM").block();
-		log.info("Newly added Domain ID is: " + testDomain.getId());
-		log.info("Newly added Domain Status is: " + testDomain.getStatus());
+		log.info("Newly added Domain ID is: {}", testDomain.getId());
+		log.info("Newly added Domain Status is: {}", testDomain.getStatus());
 
 		assertTrue(testDomain.getDomainName().equals("health.testdomain.com"));
 		
@@ -119,8 +118,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 		.verifyComplete();
 		
 		domain = domRepo.findByDomainNameIgnoreCase("health.testdomain.com").block();
-		log.info("Updated Domain ID is: " + domain.getId());
-		log.info("Updated Status is: " + domain.getStatus());
+		log.info("Updated Domain ID is: {}", domain.getId());
+		log.info("Updated Status is: {}", domain.getStatus());
 
 		
 		assertTrue(domain.getStatus() == EntityStatus.DISABLED.ordinal());
@@ -130,14 +129,16 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Test 
 	public void testGetDomain() 
 	{
-		Domain domain = new Domain("health.testdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.testdomain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
 		.expectNextCount(1) 
 		.verifyComplete();
 		
-		domain = new Domain("health.newdomain.com");
+		domain = new Domain();
+		domain.setDomainName("health.newdomain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -179,7 +180,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Test 
 	public void testDeleteDomain() 
 	{
-		Domain domain = new Domain("health.newdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.newdomain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -205,7 +207,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	@Test
 	public void testSearchDomain() 
 	{
-		Domain domain = new Domain("health.newdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.newdomain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -213,7 +216,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 		.verifyComplete();
 		
 		
-		domain = new Domain("healthy.domain.com");
+		domain = new Domain();
+		domain.setDomainName("healthy.domain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 		domRepo.save(domain)
 		.as(StepVerifier::create) 
@@ -242,7 +246,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	public void testAddDomainsWithAddresses() 
 	{
 		
-		Domain domain = new Domain("health.newdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.newdomain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 
 		
@@ -291,7 +296,8 @@ public class DomainRepositoryTest  extends SpringBaseTest
 	public void testDeleteDomainsWithAddresses() 
 	{
 		
-		Domain domain = new Domain("health.newdomain.com");
+		Domain domain = new Domain();
+		domain.setDomainName("health.newdomain.com");
 		domain.setStatus(EntityStatus.NEW.ordinal());
 		
 		domRepo.save(domain)

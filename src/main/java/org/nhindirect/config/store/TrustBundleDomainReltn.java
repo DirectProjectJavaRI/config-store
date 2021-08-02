@@ -25,12 +25,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import lombok.Data;
+
 /**
  * JPA entity object for a trust bundle to domain relationship
  * @author Greg Meyer
  * @since 1.2
  */
 @Table("trustbundledomainreltn")
+@Data
 public class TrustBundleDomainReltn 
 {
 	@Id
@@ -47,111 +50,4 @@ public class TrustBundleDomainReltn
     
 	@Column("forOutgoing")
     private boolean outgoing;
-	
-	public TrustBundleDomainReltn()
-	{
-		
-	}
-	
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    public Long getId() 
-    {
-        return id;
-    }
-    
-    /**
-    * Set the value of id.
-    * 
-    * @param id
-    *            The value of id.
-    */
-   public void setId(Long id) 
-   {
-       this.id = id;
-   }   
-   
-   /**
-    * Gets the value of the trust bundle id
-    * 
-    * @return The value of the trust bundld id
-    */
-   public Long getTrustBundleId() 
-   {
-       return trustBundleId;
-   }
-   
-   /**
-    * Sets the value of the trust bundle id
-    * 
-    * @param bundleId The value of the trust bundle id
-    */
-   public void setTrustBundleId(Long bundleId)
-   {
-	   this.trustBundleId= bundleId;
-   }
-   
-   
-   /**
-    * Gets the value of the domain id
-    * 
-    * @return The value of the domain id
-    */
-   public Long getDomainId() 
-   {
-       return domainId;
-   }
-   
-   /**
-    * Sets the value of the domain id
-    * 
-    * @param domainId The value of the domain id
-    */
-   public void setDomainId(Long domainId)
-   {
-	   this.domainId = domainId;
-   }  
-   
-   /**
-    * Get the value of incoming.
-    * 
-    * @return the value of incoming.
-    */
-   public boolean isIncoming() 
-   {
-       return incoming;
-   }
-
-   /**
-    * Set the value of incoming.
-    * 
-    * @param incoming
-    *            The value of incoming.
-    */
-   public void setIncoming(boolean incoming) 
-   {
-       this.incoming = incoming;
-   } 
-   
-   /**
-    * Get the value of outgoing.
-    * 
-    * @return the value of outgoing.
-    */
-   public boolean isOutgoing() {
-       return outgoing;
-   }
-
-   /**
-    * Set the value of outgoing.
-    * 
-    * @param outgoing
-    *            The value of outgoing.
-    */
-   public void setOutgoing(boolean outgoing) {
-       this.outgoing = outgoing;
-   }
 }

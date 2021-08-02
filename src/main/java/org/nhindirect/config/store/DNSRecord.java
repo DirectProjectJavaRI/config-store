@@ -19,11 +19,12 @@ package org.nhindirect.config.store;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import org.bouncycastle.util.Arrays;
 import org.nhindirect.config.store.util.DNSRecordUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import lombok.Data;
 
 /**
  * The JPA Domain class representing a DNS record.  This is a generic DNS record that can represent (in theory) any
@@ -33,6 +34,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @since 1.1
  */
 @Table("dnsrecord")
+@Data
 public class DNSRecord 
 {
 	@Id
@@ -44,143 +46,8 @@ public class DNSRecord
 	private byte[] data;
 	
 	@Column("createTime")
-    private LocalDateTime createTime;
+    private LocalDateTime createTime = LocalDateTime.now();
     
-    public DNSRecord()
-    {
-    	this.createTime = LocalDateTime.now();
-    }
-    
-    /**
-     * Gets the internal id of the record.  The record id is the primary key of the record JPA store.
-     * @return The internal id of the record.
-     */
-	public Long getId() 
-	{
-		return id;
-	}
-
-    /**
-     * Sets the internal id of the record.
-     * @param id  The internal id of the record.
-     */
-	public void setId(Long id) 
-	{
-		this.id = id;  
-	}
-
-	/**
-	 * Gets the name associated with this DNS entry.  The is generally the name that is used for lookup purposes.
-	 * @return The name associated with this DNS entry.
-	 */
-	public String getName() 
-	{
-		return name;
-	}
-    
-	/**
-	 * Sets the name associated with this DNS entry. 
-	 * @param name The name associated with this DNS entry.
-	 */
-	public void setName(String name) 
-	{
-		this.name = name;
-	}
-	
-	/**
-	 * Gets the type of the DNS record such as A, SRV, CERT, MX, and SOA. 
-	 * @return The type of the DNS record.
-	 */
-	public int getType() 
-	{
-		return type;
-	}
-	
-	/**
-	 * Gets the type of the DNS record such as A, SRV, CERT, MX, and SOA. 
-	 * @param type The type of the DNS record.
-	 */
-	public void setType(int type) 
-	{
-		this.type = type;
-	}
-	
-	/**
-	 * Gets the DNS record class such as IN, HS, and CH.
-	 * @return The DNS record class.
-	 */
-	public int getDclass() 
-	{
-		return dclass;
-	}
-	
-    /**
-     * Sets the DNS record class.
-     * @param dclass The DNS record class.
-     */
-	public void setDclass(int dclass) 
-	{
-		this.dclass = dclass;
-	}
-	
-	/**
-	 * Gets the record time to live in seconds.  The ttl represents how long a record can cached before it is considered stale.
-	 * @return The record time to live in seconds.
-	 */
-	public long getTtl() 
-	{
-		return ttl;
-	}
-	
-    /**
-     * Sets the record time to live in seconds.
-     * @param ttl The record time to live in seconds.
-     */
-	public void setTtl(long ttl) 
-	{
-		this.ttl = ttl;
-	}
-	
-    /**
-     * Gets the date/time the record was created.
-     * 
-     * @return Gets the date/time the record was created.
-     */
-    public LocalDateTime getCreateTime() 
-    {
-    	if (createTime == null)
-    		setCreateTime(LocalDateTime.now());
-    	
-        return createTime;
-    }
-
-    /**
-     * Sets the date/time the record was created.
-     * 
-     * @param timestamp The date/time the record was created.
-     */
-    public void setCreateTime(LocalDateTime timestamp) 
-    {
-    	createTime = timestamp;
-    }	
-	
-    /**
-     * Get the rdata of the record.  Rdata is generally the value of a DNS lookup such an IP address for an A lookup or an X509 certificate for a CERT lookup.
-     * @return The Rdata of the record.
-     */
-	public byte[] getData() 
-	{
-		return data;
-	}
-	
-    /**
-     * Sets the rdata of the record.
-     * @param data The rdata of the record.
-     */
-	public void setData(byte[] data) 
-	{
-		this.data = data;
-	}
 	
 	/**
 	 * Converts a raw wire transfer format of a record to a DNS record.
@@ -202,21 +69,5 @@ public class DNSRecord
 	public static byte[] toWire(DNSRecord rec) throws IOException
 	{
 		return DNSRecordUtils.toWire(rec);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @return
-	 */
-	@Override
-	public boolean equals(Object ob)
-	{
-		if (!(ob instanceof DNSRecord))
-			return false;
-		
-		DNSRecord rec = (DNSRecord)ob;
-		
-		return (rec.dclass == dclass && rec.type == type && 
-				rec.name.equals(rec.name) && Arrays.areEqual(rec.getData(), data));
 	}
 }

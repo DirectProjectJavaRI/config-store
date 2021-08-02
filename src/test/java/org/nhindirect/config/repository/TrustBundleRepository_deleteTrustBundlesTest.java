@@ -1,12 +1,13 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
 import org.nhindirect.config.store.TrustBundle;
 
 import reactor.test.StepVerifier;

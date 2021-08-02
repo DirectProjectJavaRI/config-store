@@ -1,16 +1,16 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.List;
 
-
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.nhindirect.config.SpringBaseTest;
 import org.nhindirect.config.store.Anchor;
 import org.nhindirect.config.store.EntityStatus;
@@ -28,7 +28,7 @@ public class AnchorRepositoryTest extends SpringBaseTest
 	@Autowired
 	private AnchorRepository repo;
 	
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		super.setUp();

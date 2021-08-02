@@ -1,7 +1,8 @@
 package org.nhindirect.config.repository;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+
 import org.nhindirect.common.crypto.CryptoExtensions;
 import org.nhindirect.config.SpringBaseTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public abstract class CertPolicyDaoBaseTest extends SpringBaseTest
 	}		
 	
 	
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		super.setUp();
@@ -41,7 +42,7 @@ public abstract class CertPolicyDaoBaseTest extends SpringBaseTest
 		clearPolicies();
 	}
 
-	@After
+	@AfterEach
 	public void tearDown()
 	{
 		clearDomains();

@@ -24,7 +24,6 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.CertPolicyGroup;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +31,8 @@ import reactor.core.publisher.Mono;
 
 public interface CertPolicyGroupRepository extends ReactiveCrudRepository<CertPolicyGroup, Long>
 {
-	@Query("select * from certpolicygroup cpg where upper(cpg.policyGroupName) = upper(:groupName)")
 	public Mono<CertPolicyGroup> findByPolicyGroupNameIgnoreCase(String groupName);
 	
 	@Transactional
-	@Query("delete from certpolicygroup where id in (:ids)")
 	public Mono<Void> deleteByIdIn(List<Long> ids);
 }

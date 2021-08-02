@@ -1,12 +1,14 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -39,26 +41,29 @@ public class CertPolicyGroupRepository_addPolicyGroupTest extends CertPolicyDaoB
 	}
 	
 	
-	@Test(expected=DataIntegrityViolationException.class)
+	@Test
 	public void testAddPolicyGroup_addExistingPolicy_assertException()
 	{
 		
-		CertPolicyGroup group = new CertPolicyGroup();
-		group.setPolicyGroupName("Test Group");
-		
-		groupRepo.save(group)
-		.as(StepVerifier::create) 
-		.expectNextCount(1) 
-		.verifyComplete();
-		
-		Collection<CertPolicyGroup> groups = groupRepo.findAll().collectList().block();
-		
-		assertEquals(1, groups.size());
-
-		group = new CertPolicyGroup();
-		group.setPolicyGroupName("Test Group");
-
-		groupRepo.save(group).block();
+		Assertions.assertThrows(DataIntegrityViolationException.class, () ->
+		{
+			CertPolicyGroup group = new CertPolicyGroup();
+			group.setPolicyGroupName("Test Group");
+			
+			groupRepo.save(group)
+			.as(StepVerifier::create) 
+			.expectNextCount(1) 
+			.verifyComplete();
+			
+			Collection<CertPolicyGroup> groups = groupRepo.findAll().collectList().block();
+			
+			assertEquals(1, groups.size());
+	
+			group = new CertPolicyGroup();
+			group.setPolicyGroupName("Test Group");
+	
+			groupRepo.save(group).block();
+		});
 	
 	}	
 }

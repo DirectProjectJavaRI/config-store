@@ -1,11 +1,12 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
@@ -33,7 +34,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();		
 		
 		final CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setPolicyGroupId(group.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -70,7 +71,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group1.getId());
+		reltn.setPolicyGroupId(group1.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -79,7 +80,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();
 		
 		reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group2.getId());
+		reltn.setPolicyGroupId(group2.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -91,8 +92,8 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		assertEquals(2, policies.size());
 		
 		Iterator<CertPolicyGroupDomainReltn> polIter = policies.iterator();
-		assertEquals(group1.getId(), polIter.next().getCertPolicyGroupId());
-		assertEquals(group2.getId(), polIter.next().getCertPolicyGroupId());
+		assertEquals(group1.getId(), polIter.next().getPolicyGroupId());
+		assertEquals(group2.getId(), polIter.next().getPolicyGroupId());
 	}	
 	
 	@Test
@@ -127,7 +128,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group1.getId());
+		reltn.setPolicyGroupId(group1.getId());
 		reltn.setDomainId(domain1.getId());
 		
 		reltnRepo.save(reltn)
@@ -136,7 +137,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();
 		
 		reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group2.getId());
+		reltn.setPolicyGroupId(group2.getId());
 		reltn.setDomainId(domain2.getId());
 		
 		reltnRepo.save(reltn)
@@ -148,13 +149,13 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		assertEquals(1, policies.size());
 		
 		Iterator<CertPolicyGroupDomainReltn> polIter = policies.iterator();
-		assertEquals(group1.getId(), polIter.next().getCertPolicyGroupId());
+		assertEquals(group1.getId(), polIter.next().getPolicyGroupId());
 		
 		policies = reltnRepo.findByDomainId(domain2.getId()).collectList().block();
 		assertEquals(1, policies.size());
 		
 		polIter = policies.iterator();
-		assertEquals(group2.getId(), polIter.next().getCertPolicyGroupId());
+		assertEquals(group2.getId(), polIter.next().getPolicyGroupId());
 
 	}	
 
@@ -183,7 +184,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group1.getId());
+		reltn.setPolicyGroupId(group1.getId());
 		reltn.setDomainId(domain1.getId());
 		
 		reltnRepo.save(reltn)
@@ -192,7 +193,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		.verifyComplete();
 		
 		reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group1.getId());
+		reltn.setPolicyGroupId(group1.getId());
 		reltn.setDomainId(domain2.getId());
 		
 		reltnRepo.save(reltn)
@@ -204,13 +205,13 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupsByDomainTest ex
 		assertEquals(1, policies.size());
 		
 		Iterator<CertPolicyGroupDomainReltn> polIter = policies.iterator();
-		assertEquals(group1.getId(), polIter.next().getCertPolicyGroupId());
+		assertEquals(group1.getId(), polIter.next().getPolicyGroupId());
 		
 		policies = reltnRepo.findByDomainId(domain2.getId()).collectList().block();
 		assertEquals(1, policies.size());
 		
 		polIter = policies.iterator();
-		assertEquals(group1.getId(), polIter.next().getCertPolicyGroupId());
+		assertEquals(group1.getId(), polIter.next().getPolicyGroupId());
 
 	}
 	

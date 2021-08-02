@@ -25,7 +25,6 @@ package org.nhindirect.config.repository;
 import java.util.List;
 
 import org.nhindirect.config.store.DNSRecord;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,16 +33,12 @@ import reactor.core.publisher.Mono;
 
 public interface DNSRepository extends ReactiveCrudRepository<DNSRecord, Long>
 {
-	@Query("select * from dnsrecord d where upper(d.name) = upper(:name)")
 	public Flux<DNSRecord> findByNameIgnoreCase(String name);
 	
-	@Query("select * from dnsrecord d where upper(d.name) = upper(:name) and d.type = :type")
 	public Flux<DNSRecord> findByNameIgnoreCaseAndType(String name, int type);
 	
-	@Query("select * from dnsrecord d where d.type = :type")
 	public Flux<DNSRecord> findByType(int type);
 	
 	@Transactional
-	@Query("delete from dnsrecord where id in (:ids)")
 	public Mono<Void> deleteByIdIn(List<Long> ids);
 }

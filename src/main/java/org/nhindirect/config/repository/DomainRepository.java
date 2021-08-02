@@ -33,25 +33,20 @@ import reactor.core.publisher.Mono;
 
 public interface DomainRepository extends ReactiveCrudRepository<Domain, Long>
 {
-	@Query("select * from domain d where upper(d.domainName) = upper(:domainName)")
 	public Mono<Domain> findByDomainNameIgnoreCase(String domainName);
 	
-	@Query("select * from domain d where upper(d.domainName) like :domainName")
+	@Query("select * from domain d where upper(d.domainName) like upper(:domainName)")
 	public Flux<Domain> findByDomainNameContainingIgnoreCase(String domainName);
 	
 	@Query("select * from domain d where upper(d.domainName) like upper(:domainName) and d.status = :status")
 	public Flux<Domain> findByDomainNameContainingIgnoreCaseAndStatus(String domainName,  int status);
 	
-	@Query("select * from domain d where upper(d.domainName) in (:domainNames)")
 	public Flux<Domain> findByDomainNameInIgnoreCase(List<String> domainNames);
 	
-	@Query("select * from domain d where upper(d.domainName) in (:domainNames) and d.status = :status")
 	public Flux<Domain> findByDomainNameInIgnoreCaseAndStatus(List<String> domainNames, int status);
 	
-	@Query("select * from domain d where d.status = :status")
 	public Flux<Domain> findByStatus(int status);	
 	
 	@Transactional
-	@Query("delete from domain where upper(domainName) = upper(:domainName)")
 	public Mono<Void> deleteByDomainNameIgnoreCase(String domainName);
 }

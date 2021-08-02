@@ -22,7 +22,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package org.nhindirect.config.repository;
 
 import org.nhindirect.config.store.TrustBundleDomainReltn;
-import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,19 +30,14 @@ import reactor.core.publisher.Mono;
 
 public interface TrustBundleDomainReltnRepository extends ReactiveCrudRepository<TrustBundleDomainReltn, Long>
 {
-	@Transactional
-	@Query("select * from trustbundledomainreltn r where r.domain_id = :domainId")
 	public Flux<TrustBundleDomainReltn> findByDomainId(Long domainId);
 	
 	@Transactional
-	@Query("delete from trustbundledomainreltn where domain_id = :domainId")
 	public Mono<Void> deleteByDomainId(Long domainId);
 	
 	@Transactional
-	@Query("delete from trustbundledomainreltn where trust_bundle_id = :trustBundleId")
 	public Mono<Void> deleteByTrustBundleId(Long trustBundleId);
 	
 	@Transactional
-	@Query("delete from trustbundledomainreltn where domain_id = :domainId and trust_bundle_id = :trustBundleId")
 	public Mono<Void> deleteByDomainIdAndTrustBundleId(Long domainId, Long trustBundleId);
 }

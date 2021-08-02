@@ -1,18 +1,17 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import org.junit.Test;
 import org.nhindirect.config.store.Domain;
 import org.nhindirect.config.store.TrustBundle;
 import org.nhindirect.config.store.TrustBundleDomainReltn;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.test.StepVerifier;
 
-@Transactional
 public class TrustBundleRepository_disassociateTrustBundleFromDomainTest extends TrustBundleDaoBaseTest
 {
 	@Test

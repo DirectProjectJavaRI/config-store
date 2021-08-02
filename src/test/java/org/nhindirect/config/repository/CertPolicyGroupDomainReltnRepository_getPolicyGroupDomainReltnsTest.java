@@ -1,11 +1,12 @@
 package org.nhindirect.config.repository;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Test;
 import org.nhindirect.config.store.CertPolicyGroup;
 import org.nhindirect.config.store.CertPolicyGroupDomainReltn;
 import org.nhindirect.config.store.Domain;
@@ -41,7 +42,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupDomainReltnsTest
 		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group.getId());
+		reltn.setPolicyGroupId(group.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -53,7 +54,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupDomainReltnsTest
 		assertEquals(1, reltns.size());
 		
 		reltn = reltns.iterator().next();
-		assertEquals(group.getId(), reltn.getCertPolicyGroupId());
+		assertEquals(group.getId(), reltn.getPolicyGroupId());
 		assertEquals(domain.getId(), reltn.getDomainId());
 		
 	}	
@@ -85,7 +86,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupDomainReltnsTest
 		.verifyComplete();
 		
 		CertPolicyGroupDomainReltn reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group1.getId());
+		reltn.setPolicyGroupId(group1.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -94,7 +95,7 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupDomainReltnsTest
 		.verifyComplete();
 		
 		reltn = new CertPolicyGroupDomainReltn();
-		reltn.setCertPolicyGroupId(group2.getId());
+		reltn.setPolicyGroupId(group2.getId());
 		reltn.setDomainId(domain.getId());
 		
 		reltnRepo.save(reltn)
@@ -108,11 +109,11 @@ public class CertPolicyGroupDomainReltnRepository_getPolicyGroupDomainReltnsTest
 		Iterator<CertPolicyGroupDomainReltn> iter = reltns.iterator();
 		
 		reltn = iter.next();
-		assertEquals(group1.getId(), reltn.getCertPolicyGroupId());
+		assertEquals(group1.getId(), reltn.getPolicyGroupId());
 		assertEquals(domain.getId(), reltn.getDomainId());
 		
 		reltn = iter.next();
-		assertEquals(group2.getId(), reltn.getCertPolicyGroupId());
+		assertEquals(group2.getId(), reltn.getPolicyGroupId());
 		assertEquals(domain.getId(), reltn.getDomainId());
 	}
 }
