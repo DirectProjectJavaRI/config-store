@@ -54,7 +54,6 @@
       <dsn.version>1.6.7</dsn.version>
       <commons-io.version>2.8.0</commons-io.version>
       <commons-collections4.version>4.4</commons-collections4.version>   
-      <bcprov-jdk15on.version>1.68</bcprov-jdk15on.version>
       <joda-time.version>2.10.9</joda-time.version>
     </properties>      
 	<dependencies>
@@ -74,17 +73,17 @@
 		<dependency>
 			<groupId>org.nhind</groupId>
 			<artifactId>direct-policy</artifactId>
-			<version>8.0.0</version>
+			<version>8.1.0-SNAPSHOT</version>
 		</dependency>	
 		<dependency>
 			<groupId>org.nhind</groupId>
 			<artifactId>config-model</artifactId>
-			<version>8.0.0</version>
+			<version>8.1.0-SNAPSHOT</version>
 		</dependency>		
 		<dependency>
 			<groupId>org.nhind</groupId>
 			<artifactId>direct-common</artifactId>
-			<version>8.0.0</version>
+			<version>8.1.0-SNAPSHOT</version>
 		</dependency>						
 	    <dependency>
 	    	<groupId>commons-io</groupId>
@@ -95,12 +94,7 @@
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-collections4</artifactId>
 		    <version>${commons-collections4.version}</version>
-		</dependency> 		  		
-		<dependency>
-		    <groupId>org.bouncycastle</groupId>
-		    <artifactId>bcprov-jdk15on</artifactId>
-		    <version>${bcprov-jdk15on.version}</version>    
-		</dependency>   
+		</dependency> 		  		 
 		<dependency>
 		    <groupId>dnsjava</groupId>
 		    <artifactId>dnsjava</artifactId>
