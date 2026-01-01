@@ -18,7 +18,7 @@
     <parent>
 	   <groupId>org.springframework.boot</groupId>
 	   <artifactId>spring-boot-dependencies</artifactId>
-	   <version>3.5.0</version>
+	   <version>4.0.1</version>
 	   <relativePath />
     </parent>	    	
     <developers>
@@ -50,7 +50,7 @@
        </license>
     </licenses> 
     <properties>
-      <joda-time.version>2.10.9</joda-time.version>
+      <joda-time.version>2.14.0</joda-time.version>
     </properties>      
 	<dependencies>
 	    <dependency>
@@ -100,21 +100,11 @@
 		    <artifactId>spring-boot-starter-test</artifactId>
 		    <scope>test</scope>
 		</dependency>	 
-		<dependency>
-		    <groupId>com.h2database</groupId>
-		    <artifactId>h2</artifactId>
-		    <scope>test</scope>
-		</dependency>	
 	    <dependency>
 	       <groupId>io.r2dbc</groupId>
 	       <artifactId>r2dbc-h2</artifactId>
 	       <scope>test</scope>
-	    </dependency>		
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <scope>test</scope>
-        </dependency>	        				        					
+	    </dependency>		        				        					
 	</dependencies>
 	<build>
 		<extensions>

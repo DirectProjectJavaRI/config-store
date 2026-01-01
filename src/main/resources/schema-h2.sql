@@ -1,50 +1,50 @@
 CREATE TABLE IF NOT EXISTS certificate ( id bigint PRIMARY KEY AUTO_INCREMENT, owner VARCHAR(100) NOT NULL, thumbprint VARCHAR(100) NOT NULL, certificateData blob NOT NULL,
-createTime datetime DEFAULT NULL, validStartDate datetime DEFAULT NULL, validEndDate datetime DEFAULT NULL, status int, 
+createTime timestamp DEFAULT NULL, validStartDate timestamp DEFAULT NULL, validEndDate timestamp DEFAULT NULL, status int,
 privateKey boolean);
 				
-CREATE TABLE IF NOT EXISTS anchor (id bigint NOT NULL AUTO_INCREMENT, certificateId int NOT NULL, createTime datetime DEFAULT NULL, 
+CREATE TABLE IF NOT EXISTS anchor (id bigint NOT NULL AUTO_INCREMENT, certificateId int NOT NULL, createTime timestamp DEFAULT NULL,
 certificateData blob, forIncoming boolean DEFAULT NULL, forOutgoing boolean DEFAULT NULL, 
 owner varchar(255) DEFAULT NULL, status int DEFAULT NULL, 
-thumbprint varchar(255) DEFAULT NULL, validEndDate datetime DEFAULT NULL, 
-validStartDate datetime DEFAULT NULL, PRIMARY KEY (id));
+thumbprint varchar(255) DEFAULT NULL, validEndDate timestamp DEFAULT NULL,
+validStartDate timestamp DEFAULT NULL, PRIMARY KEY (id));
 				
 CREATE TABLE IF NOT EXISTS dnsrecord (id bigint NOT NULL AUTO_INCREMENT, 
-createTime datetime DEFAULT NULL, data blob, dclass int DEFAULT NULL, 
+createTime timestamp DEFAULT NULL, data blob, dclass int DEFAULT NULL,
 name varchar(255) DEFAULT NULL, ttl bigint DEFAULT NULL,  
 type int DEFAULT NULL, PRIMARY KEY (id));
 				
 CREATE TABLE IF NOT EXISTS setting (id bigint NOT NULL AUTO_INCREMENT, 
-createTime datetime DEFAULT NULL, name varchar(255) DEFAULT NULL, 
-status int DEFAULT NULL, updateTime datetime DEFAULT NULL, 
+createTime timestamp DEFAULT NULL, name varchar(255) DEFAULT NULL,
+status int DEFAULT NULL, updateTime timestamp DEFAULT NULL,
 `value` varchar(4096) DEFAULT NULL, PRIMARY KEY (id));
 
 CREATE UNIQUE INDEX IF NOT EXISTS UKbk4oycm648x0ox633r4m22b7d ON setting(name);
 				
 CREATE TABLE IF NOT EXISTS domain ( id bigint NOT NULL AUTO_INCREMENT, 
-createTime datetime DEFAULT NULL, domainName varchar(255) DEFAULT NULL, 
+createTime timestamp DEFAULT NULL, domainName varchar(255) DEFAULT NULL,
 postmasterAddressId bigint DEFAULT NULL, status int DEFAULT NULL,  
-updateTime datetime DEFAULT NULL,  PRIMARY KEY (id));
+updateTime timestamp DEFAULT NULL,  PRIMARY KEY (id));
 
 CREATE UNIQUE INDEX IF NOT EXISTS UK_4qyl85kb0l95n82ouqir44d0x on domain(domainName);
 				
-CREATE TABLE IF NOT EXISTS address (id bigint NOT NULL AUTO_INCREMENT, createTime datetime DEFAULT NULL, 
+CREATE TABLE IF NOT EXISTS address (id bigint NOT NULL AUTO_INCREMENT, createTime timestamp DEFAULT NULL,
 displayname varchar(100) DEFAULT NULL, emailaddress varchar(400) DEFAULT NULL, 
 endpoint varchar(255) DEFAULT NULL, status int DEFAULT NULL, 
-type varchar(64) DEFAULT NULL, updateTime datetime DEFAULT NULL, 
+type varchar(64) DEFAULT NULL, updateTime timestamp DEFAULT NULL,
 domainId bigint NOT NULL, PRIMARY KEY (id), 
 CONSTRAINT FK_3au2yxghx7hhsf0vchv1xd3kn FOREIGN KEY (domainId) REFERENCES domain (id));
 CREATE INDEX IF NOT EXISTS FK_3au2yxghx7hhsf0vchv1xd3kn ON address(domainId);
 				
 CREATE TABLE IF NOT EXISTS trustbundle (id bigint NOT NULL AUTO_INCREMENT, bundleName varchar(255) NOT NULL, 
-bundleURL varchar(255) NOT NULL, getCheckSum varchar(255) NOT NULL, createTime datetime NOT NULL, 
-lastRefreshAttempt datetime DEFAULT NULL, lastRefreshError int DEFAULT NULL, 
-lastSuccessfulRefresh datetime DEFAULT NULL, refreshInterval int DEFAULT NULL, 
+bundleURL varchar(255) NOT NULL, getCheckSum varchar(255) NOT NULL, createTime timestamp NOT NULL,
+lastRefreshAttempt timestamp DEFAULT NULL, lastRefreshError int DEFAULT NULL,
+lastSuccessfulRefresh timestamp DEFAULT NULL, refreshInterval int DEFAULT NULL,
 signingCertificateData blob, PRIMARY KEY (id));
 
 CREATE UNIQUE INDEX IF NOT EXISTS UK_7wjl5k4628iitl72bqlq6c2i9 ON trustbundle (bundleName);
 				
 CREATE TABLE IF NOT EXISTS trustbundleanchor (id bigint NOT NULL AUTO_INCREMENT, anchorData blob NOT NULL, 
-thumbprint varchar(255) NOT NULL, validEndDate datetime NOT NULL, validStartDate datetime NOT NULL, 
+thumbprint varchar(255) NOT NULL, validEndDate timestamp NOT NULL, validStartDate timestamp NOT NULL,
 trustBundleId bigint NOT NULL, PRIMARY KEY (id), 
 CONSTRAINT FK_fugf20hpqpvtj7tmmj5e7y1od FOREIGN KEY (trustBundleId) REFERENCES trustbundle (id));
 CREATE INDEX IF NOT EXISTS FK_fugf20hpqpvtj7tmmj5e7y1od ON trustbundleanchor(trustBundleId);
@@ -56,13 +56,13 @@ CONSTRAINT FK_my2vuc5a9pmw3ilxm4yphyk42 FOREIGN KEY (trust_bundle_id) REFERENCES
 CREATE INDEX IF NOT EXISTS FK_j52ek3h4x9e1ngct3ovs6mcp2 on trustbundledomainreltn(domain_id);
 CREATE INDEX IF NOT EXISTS FK_my2vuc5a9pmw3ilxm4yphyk42 on trustbundledomainreltn(trust_bundle_id);
 			    
-CREATE TABLE IF NOT EXISTS certpolicy (id bigint NOT NULL AUTO_INCREMENT, createTime datetime NOT NULL,
+CREATE TABLE IF NOT EXISTS certpolicy (id bigint NOT NULL AUTO_INCREMENT, createTime timestamp NOT NULL,
 lexicon int NOT NULL, data blob NOT NULL, policyName varchar(255) DEFAULT NULL, 
 PRIMARY KEY (id));
 
 CREATE UNIQUE INDEX IF NOT EXISTS UK_gxnmqpsot5r835vgl888kgul8 on certpolicy (policyName);
 			   
-CREATE TABLE IF NOT EXISTS certpolicygroup (id bigint NOT NULL AUTO_INCREMENT, createTime datetime NOT NULL, 
+CREATE TABLE IF NOT EXISTS certpolicygroup (id bigint NOT NULL AUTO_INCREMENT, createTime timestamp NOT NULL,
 policyGroupName varchar(255) DEFAULT NULL, PRIMARY KEY (id));
 
 CREATE UNIQUE INDEX IF NOT EXISTS UK_c749eoa4ewcyqou5270tj7r04 ON certpolicygroup (policyGroupName);
