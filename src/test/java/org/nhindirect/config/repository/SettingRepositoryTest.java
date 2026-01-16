@@ -21,6 +21,7 @@ public class SettingRepositoryTest extends SpringBaseTest
 	@Autowired
 	private SettingRepository repo;	
 	
+	
 	protected Setting newSetting(String name, String value)
 	{
 		final Setting retVal = new Setting();
