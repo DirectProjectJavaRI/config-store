@@ -35,10 +35,8 @@ public interface DomainRepository extends ReactiveCrudRepository<Domain, Long>
 {
 	public Mono<Domain> findByDomainNameIgnoreCase(String domainName);
 	
-	@Query("select * from domain d where upper(d.domainName) like upper(:domainName)")
 	public Flux<Domain> findByDomainNameContainingIgnoreCase(String domainName);
 	
-	@Query("select * from domain d where upper(d.domainName) like upper(:domainName) and d.status = :status")
 	public Flux<Domain> findByDomainNameContainingIgnoreCaseAndStatus(String domainName,  int status);
 	
 	public Flux<Domain> findByDomainNameInIgnoreCase(List<String> domainNames);

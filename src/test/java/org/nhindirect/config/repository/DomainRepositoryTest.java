@@ -225,16 +225,16 @@ public class DomainRepositoryTest  extends SpringBaseTest
 		.verifyComplete();
 		
 		
-		String name = "heaL";
-		List<Domain> result = domRepo.findByDomainNameContainingIgnoreCase("%" + name.toUpperCase() + "%").collectList().block();
+		String name = "eaLTh";
+		List<Domain> result = domRepo.findByDomainNameContainingIgnoreCase(name).collectList().block();
 		assertEquals(2, result.size());
 		
 		name = "coM";
-		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus("%" + name.toUpperCase() + "%", EntityStatus.NEW.ordinal()).collectList().block();
+		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus(name, EntityStatus.NEW.ordinal()).collectList().block();
 		assertEquals(2, result.size());
 		
 		name = "coM";
-		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus("%" + name.toUpperCase() + "%", EntityStatus.DISABLED.ordinal()).collectList().block();
+		result = domRepo.findByDomainNameContainingIgnoreCaseAndStatus(name, EntityStatus.DISABLED.ordinal()).collectList().block();
 		assertEquals(0, result.size());
 		
 		log.debug("Exit");
