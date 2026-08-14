@@ -39,6 +39,8 @@ public interface AddressRepository extends ReactiveCrudRepository<Address, Long>
 	public Flux<Address> findByEmailAddressInIgnoreCaseAndStatus(List<String> emailAddresses, EntityStatus status);
 	
 	public Flux<Address> findByDomainId(Long domainId);
+
+	public Flux<Address> findByDomainIdIn(List<Long> domainIds);
 	
 	public Mono<Void> deleteByDomainId(Long domainId);
 	

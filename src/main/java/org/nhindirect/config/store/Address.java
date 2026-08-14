@@ -146,7 +146,7 @@ public class Address {
      */
     public Long getId() {
         if (id == null) {
-            setId(new Long(0L));
+            setId(Long.valueOf(0L));
         }
         return id;
     }
